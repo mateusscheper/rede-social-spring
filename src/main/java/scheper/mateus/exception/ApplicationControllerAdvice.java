@@ -2,6 +2,7 @@ package scheper.mateus.exception;
 
 import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -37,6 +38,7 @@ public class ApplicationControllerAdvice {
     public ApiErrors handleException(HttpRequestMethodNotSupportedException e) {
         return new ApiErrors(String.format("Método %s não permitido.", e.getMethod()));
     }
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseStatus(HttpStatus.METHOD_NOT_ALLOWED)
     public ApiErrors handleException(MethodArgumentNotValidException e) {
@@ -45,6 +47,12 @@ public class ApplicationControllerAdvice {
                 .map(DefaultMessageSourceResolvable::getDefaultMessage)
                 .toList();
         return new ApiErrors(errosEmString);
+    }
+
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    @ResponseStatus(HttpStatus.METHOD_NOT_ALLOWED)
+    public ApiErrors handleException(HttpMessageNotReadableException e) {
+        return new ApiErrors("Dados inválidos.");
     }
 
 }

@@ -2,7 +2,10 @@ package scheper.mateus.dto;
 
 import java.io.Serial;
 import java.io.Serializable;
+import java.math.BigInteger;
 import java.util.Objects;
+
+import static scheper.mateus.utils.NumberUtils.castBigIntegerToLong;
 
 public class UsuarioDTO implements Serializable {
 
@@ -19,6 +22,18 @@ public class UsuarioDTO implements Serializable {
         this.idUsuario = idUsuario;
         this.nome = nome;
         this.foto = foto;
+    }
+
+    public UsuarioDTO(Object[] dadosPost) {
+        if (dadosPost.length == 3) {
+            this.idUsuario = castBigIntegerToLong(dadosPost[0]);
+            this.nome = (String) dadosPost[1];
+            this.foto = (String) dadosPost[2];
+        } else {
+            this.idUsuario = castBigIntegerToLong(dadosPost[3]);
+            this.nome = (String) dadosPost[4];
+            this.foto = (String) dadosPost[5];
+        }
     }
 
     public Long getIdUsuario() {

@@ -59,6 +59,9 @@ public class Usuario {
     @OneToMany(fetch = FetchType.LAZY)
     private List<Post> postagens = new ArrayList<>();
 
+    public Usuario() {
+    }
+
     public Usuario(NovoUsuarioDTO novoUsuarioDTO) {
         this.nome = novoUsuarioDTO.getNome().trim();
         this.email = novoUsuarioDTO.getEmail().toLowerCase().trim();
