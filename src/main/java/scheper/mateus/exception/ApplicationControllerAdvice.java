@@ -1,5 +1,6 @@
 package scheper.mateus.exception;
 
+import com.fasterxml.jackson.databind.exc.InvalidDefinitionException;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -40,7 +41,7 @@ public class ApplicationControllerAdvice {
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    @ResponseStatus(HttpStatus.METHOD_NOT_ALLOWED)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ApiErrors handleException(MethodArgumentNotValidException e) {
         List<String> errosEmString = e.getAllErrors()
                 .stream()
@@ -49,9 +50,12 @@ public class ApplicationControllerAdvice {
         return new ApiErrors(errosEmString);
     }
 
-    @ExceptionHandler(HttpMessageNotReadableException.class)
-    @ResponseStatus(HttpStatus.METHOD_NOT_ALLOWED)
-    public ApiErrors handleException(HttpMessageNotReadableException e) {
+    @ExceptionHandler({
+            HttpMessageNotReadableException.class,
+            InvalidDefinitionException.class
+    })
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ApiErrors handleException(Exception e) {
         return new ApiErrors("Dados inválidos.");
     }
 

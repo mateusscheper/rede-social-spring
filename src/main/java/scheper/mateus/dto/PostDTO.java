@@ -2,6 +2,8 @@ package scheper.mateus.dto;
 
 import java.io.Serial;
 import java.io.Serializable;
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.Objects;
 
 import static scheper.mateus.utils.NumberUtils.castBigIntegerToLong;
@@ -19,14 +21,17 @@ public class PostDTO implements Serializable {
 
     private UsuarioDTO criador;
 
+    private LocalDateTime criacao;
+
     public PostDTO() {
     }
 
-    public PostDTO(Long idPost, String descricao, String arquivo, UsuarioDTO criador) {
+    public PostDTO(Long idPost, String descricao, String arquivo, UsuarioDTO criador, LocalDateTime criacao) {
         this.idPost = idPost;
         this.descricao = descricao;
         this.arquivo = arquivo;
         this.criador = criador;
+        this.criacao = criacao;
     }
 
     public PostDTO(Object[] dadosPost) {
@@ -34,6 +39,7 @@ public class PostDTO implements Serializable {
         this.descricao = (String) dadosPost[1];
         this.arquivo = (String) dadosPost[2];
         this.criador = new UsuarioDTO(dadosPost);
+        this.criacao = ((Timestamp) dadosPost[6]).toLocalDateTime();
     }
 
     public Long getIdPost() {
@@ -66,6 +72,14 @@ public class PostDTO implements Serializable {
 
     public void setCriador(UsuarioDTO criador) {
         this.criador = criador;
+    }
+
+    public LocalDateTime getCriacao() {
+        return criacao;
+    }
+
+    public void setCriacao(LocalDateTime criacao) {
+        this.criacao = criacao;
     }
 
     @Override

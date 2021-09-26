@@ -6,12 +6,14 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 import scheper.mateus.dto.ComentarioDTO;
 import scheper.mateus.dto.NovoComentarioDTO;
 import scheper.mateus.dto.NovoPostDTO;
-import scheper.mateus.dto.NovoUsuarioDTO;
 import scheper.mateus.dto.PostDTO;
 import scheper.mateus.dto.UsuarioDTO;
 import scheper.mateus.service.PostService;
@@ -39,10 +41,10 @@ public class PostController {
         return postService.findPostsByIdUsuario(idUsuario);
     }
 
-    @PostMapping
+    @PostMapping(consumes = { "multipart/form-data", "application/json" })
     @ResponseStatus(HttpStatus.CREATED)
-    public void save(@RequestBody @Valid NovoPostDTO novoPostDTO) {
-        postService.save(novoPostDTO);
+    public void save(@RequestPart String post, @RequestPart(value = "imagem", required = false) MultipartFile imagem) {
+        postService.save(post, imagem);
     }
 
     @GetMapping("/{idUsuario}/amigo")
