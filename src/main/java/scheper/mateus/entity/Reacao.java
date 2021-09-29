@@ -1,13 +1,22 @@
 package scheper.mateus.entity;
 
+import scheper.mateus.enums.ReacaoEnum;
+
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 
 @Entity
 @Table(schema = "api", name = "reacao")
@@ -17,17 +26,33 @@ public class Reacao {
     @GeneratedValue
     private Long idReacao;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private Post post;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    private TipoReacao tipo;
+    @Column(name = "tipo", nullable = false)
+    private String tipo;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    private Usuario usuario;
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(name = "reacao_usuarios",
+            schema = "api",
+            joinColumns = {
+                    @JoinColumn(name = "id_reacao")
+            },
+            inverseJoinColumns = {
+                    @JoinColumn(name = "id_usuario")
+            })
+    private List<Usuario> usuarios = new ArrayList<>();
 
-    @Column(name = "data_hora", nullable = false)
-    private LocalDateTime dataHora;
+    @Column(name = "criacao", nullable = false)
+    private LocalDateTime criacao;
+
+    public Reacao() {
+    }
+
+    public Reacao(ReacaoEnum reacaoEnum) {
+        this.tipo = reacaoEnum.getNome();
+        this.criacao = LocalDateTime.now();
+    }
 
     public Long getIdReacao() {
         return idReacao;
@@ -45,27 +70,40 @@ public class Reacao {
         this.post = post;
     }
 
-    public TipoReacao getTipo() {
+    public String getTipo() {
         return tipo;
     }
 
-    public void setTipo(TipoReacao tipo) {
+    public void setTipo(String tipo) {
         this.tipo = tipo;
     }
 
-    public Usuario getUsuario() {
-        return usuario;
+    public List<Usuario> getUsuarios() {
+        return usuarios;
     }
 
-    public void setUsuario(Usuario usuario) {
-        this.usuario = usuario;
+    public void setUsuarios(List<Usuario> usuario) {
+        this.usuarios = usuario;
     }
 
-    public LocalDateTime getDataHora() {
-        return dataHora;
+    public LocalDateTime getCriacao() {
+        return criacao;
     }
 
-    public void setDataHora(LocalDateTime dataHora) {
-        this.dataHora = dataHora;
+    public void setCriacao(LocalDateTime criacao) {
+        this.criacao = criacao;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Reacao reacao = (Reacao) o;
+        return Objects.equals(idReacao, reacao.idReacao) && Objects.equals(post, reacao.post);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(idReacao, post);
     }
 }

@@ -21,7 +21,8 @@ public interface PostRepository extends JpaRepository<Post, Long> {
             "               FROM api.post " +
             "                        LEFT JOIN api.post_arquivos ON post.id_post = post_arquivos.id_post " +
             "                        LEFT JOIN api.arquivo pa ON post_arquivos.id_arquivo = pa.id_arquivo " +
-            "                        JOIN api.usuario ON post.criador_id_usuario = usuario.id_usuario " +
+            "                        JOIN api.usuario_posts ON post.id_post = usuario_posts.id_post " +
+            "                        JOIN api.usuario ON usuario_posts.id_usuario = usuario.id_usuario " +
             "                        LEFT JOIN api.arquivo ON usuario.id_arquivo_foto = arquivo.id_arquivo " +
             "                        JOIN api.usuario_amigos ON usuario.id_usuario = usuario_amigos.id_usuario_amigo " +
             "               WHERE api.usuario_amigos.id_usuario = :idUsuario " +
@@ -36,7 +37,8 @@ public interface PostRepository extends JpaRepository<Post, Long> {
             "               FROM api.post " +
             "                        LEFT JOIN api.post_arquivos ON post.id_post = post_arquivos.id_post " +
             "                        LEFT JOIN api.arquivo pa ON post_arquivos.id_arquivo = pa.id_arquivo " +
-            "                        JOIN api.usuario ON post.criador_id_usuario = usuario.id_usuario " +
+            "                        JOIN api.usuario_posts ON post.id_post = usuario_posts.id_post " +
+            "                        JOIN api.usuario ON usuario_posts.id_usuario = usuario.id_usuario " +
             "                        LEFT JOIN api.arquivo ON usuario.id_arquivo_foto = arquivo.id_arquivo " +
             "               WHERE api.usuario.id_usuario = :idUsuario) " +
             "SELECT * " +

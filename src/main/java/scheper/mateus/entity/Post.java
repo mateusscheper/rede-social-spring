@@ -23,10 +23,11 @@ public class Post {
 
     @Id
     @GeneratedValue
+    @Column(name = "id_post")
     private Long idPost;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    private Usuario criador;
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private Usuario usuario;
 
     @Column(name = "criacao", nullable = false)
     private LocalDateTime criacao;
@@ -34,10 +35,18 @@ public class Post {
     @Column(name = "exclusao")
     private LocalDateTime exclusao;
 
-    @OneToMany(fetch = FetchType.LAZY)
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinTable(name = "post_visualizadores",
+            schema = "api",
+            joinColumns = {
+                    @JoinColumn(name = "id_post", referencedColumnName = "id_post")
+            },
+            inverseJoinColumns = {
+                    @JoinColumn(name = "id_usuario", referencedColumnName = "id_usuario")
+            })
     private List<Usuario> visualizadores = new ArrayList<>();
 
-    @ManyToMany(fetch = FetchType.LAZY)
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinTable(name = "post_reacoes",
             schema = "api",
             joinColumns = {
@@ -70,12 +79,12 @@ public class Post {
         this.idPost = idPost;
     }
 
-    public Usuario getCriador() {
-        return criador;
+    public Usuario getUsuario() {
+        return usuario;
     }
 
-    public void setCriador(Usuario criador) {
-        this.criador = criador;
+    public void setUsuario(Usuario criador) {
+        this.usuario = criador;
     }
 
     public LocalDateTime getCriacao() {

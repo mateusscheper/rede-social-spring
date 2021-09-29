@@ -2,6 +2,7 @@ package scheper.mateus.entity;
 
 import scheper.mateus.dto.NovoUsuarioDTO;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -26,6 +27,7 @@ public class Usuario {
 
     @Id
     @GeneratedValue
+    @Column(name = "id_usuario")
     private Long idUsuario;
 
     @Column(name = "nome", nullable = false)
@@ -56,8 +58,16 @@ public class Usuario {
             })
     private List<Usuario> amigos = new ArrayList<>();
 
-    @OneToMany(fetch = FetchType.LAZY)
-    private List<Post> postagens = new ArrayList<>();
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinTable(name = "usuario_posts",
+            schema = "api",
+            joinColumns = {
+                    @JoinColumn(name = "id_usuario")
+            },
+            inverseJoinColumns = {
+                    @JoinColumn(name = "id_post")
+            })
+    private List<Post> posts = new ArrayList<>();
 
     public Usuario() {
     }
@@ -124,12 +134,12 @@ public class Usuario {
         this.amigos = amigos;
     }
 
-    public List<Post> getPostagens() {
-        return postagens;
+    public List<Post> getPosts() {
+        return posts;
     }
 
-    public void setPostagens(List<Post> postagens) {
-        this.postagens = postagens;
+    public void setPosts(List<Post> postagens) {
+        this.posts = postagens;
     }
 
     @Override
@@ -137,11 +147,11 @@ public class Usuario {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Usuario usuario = (Usuario) o;
-        return Objects.equals(idUsuario, usuario.idUsuario) && Objects.equals(nome, usuario.nome) && Objects.equals(email, usuario.email) && Objects.equals(foto, usuario.foto) && Objects.equals(dataNascimento, usuario.dataNascimento) && Objects.equals(dataBloqueio, usuario.dataBloqueio) && Objects.equals(amigos, usuario.amigos) && Objects.equals(postagens, usuario.postagens);
+        return Objects.equals(idUsuario, usuario.idUsuario);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(idUsuario, email);
+        return Objects.hash(idUsuario);
     }
 }

@@ -1,7 +1,5 @@
 package scheper.mateus.dto;
 
-import scheper.mateus.utils.NumberUtils;
-
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.Objects;
@@ -11,49 +9,54 @@ public class ReacaoDTO implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    private Long idUsuario;
+    private Long idReacao;
 
-    private String nomeUsuario;
+    private String nome;
 
-    private String tipo;
+    private String icone;
 
-    public ReacaoDTO() {
+    private Integer quantidade;
+
+    private boolean marcado;
+
+    public Long getIdReacao() {
+        return idReacao;
     }
 
-    public ReacaoDTO(Long idUsuario, String nomeUsuario, String tipo) {
-        this.idUsuario = idUsuario;
-        this.nomeUsuario = nomeUsuario;
-        this.tipo = tipo;
+    public void setIdReacao(Long idReacao) {
+        this.idReacao = idReacao;
     }
 
-    public ReacaoDTO(Object[] dados) {
-        this.idUsuario = NumberUtils.castBigIntegerToLong(dados[3]);
-        this.nomeUsuario = (String) dados[4];
-        this.tipo = (String) dados[1];
+    public String getNome() {
+        return nome;
     }
 
-    public Long getIdUsuario() {
-        return idUsuario;
+    public void setNome(String nome) {
+        this.nome = nome;
     }
 
-    public void setIdUsuario(Long idUsuario) {
-        this.idUsuario = idUsuario;
+    public String getIcone() {
+        return icone;
     }
 
-    public String getNomeUsuario() {
-        return nomeUsuario;
+    public void setIcone(String icone) {
+        this.icone = icone;
     }
 
-    public void setNomeUsuario(String nomeUsuario) {
-        this.nomeUsuario = nomeUsuario;
+    public Integer getQuantidade() {
+        return quantidade;
     }
 
-    public String getTipo() {
-        return tipo;
+    public void setQuantidade(Integer quantidade) {
+        this.quantidade = quantidade;
     }
 
-    public void setTipo(String tipo) {
-        this.tipo = tipo;
+    public boolean isMarcado() {
+        return marcado;
+    }
+
+    public void setMarcado(boolean marcado) {
+        this.marcado = marcado;
     }
 
     @Override
@@ -61,11 +64,11 @@ public class ReacaoDTO implements Serializable {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         ReacaoDTO reacaoDTO = (ReacaoDTO) o;
-        return Objects.equals(idUsuario, reacaoDTO.idUsuario) && Objects.equals(nomeUsuario, reacaoDTO.nomeUsuario) && Objects.equals(tipo, reacaoDTO.tipo);
+        return Objects.equals(idReacao, reacaoDTO.idReacao) && Objects.equals(nome, reacaoDTO.nome) && Objects.equals(icone, reacaoDTO.icone) && Objects.equals(quantidade, reacaoDTO.quantidade);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(idUsuario, nomeUsuario, tipo);
+        return Objects.hash(idReacao, nome, icone, quantidade);
     }
 }

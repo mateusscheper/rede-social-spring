@@ -44,4 +44,8 @@ public class UsuarioService {
         novoUsuarioDTO.setEmail(usuario.getEmail());
         return novoUsuarioDTO;
     }
+
+    public Usuario findUsuarioById(Long idUsuario) {
+        return usuarioRepository.getById(idUsuario);
+    }
 }

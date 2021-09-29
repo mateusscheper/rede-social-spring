@@ -9,7 +9,6 @@ import scheper.mateus.dto.ComentarioDTO;
 import scheper.mateus.dto.NovoComentarioDTO;
 import scheper.mateus.dto.NovoPostDTO;
 import scheper.mateus.dto.PostDTO;
-import scheper.mateus.dto.ReacaoDTO;
 import scheper.mateus.entity.Arquivo;
 import scheper.mateus.entity.Comentario;
 import scheper.mateus.entity.Post;
@@ -21,7 +20,6 @@ import scheper.mateus.repository.UsuarioRepository;
 import scheper.mateus.utils.NumberUtils;
 
 import javax.persistence.Transient;
-import javax.servlet.http.HttpServletRequest;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -41,13 +39,13 @@ public class PostService {
 
     private final ComentarioRepository comentarioRepository;
 
-    private final HttpServletRequest request;
+    private final ReacaoService reacaoService;
 
-    public PostService(PostRepository postRepository, UsuarioRepository usuarioRepository, ComentarioRepository comentarioRepository, HttpServletRequest request) {
+    public PostService(PostRepository postRepository, UsuarioRepository usuarioRepository, ComentarioRepository comentarioRepository, ReacaoService reacaoService) {
         this.postRepository = postRepository;
         this.usuarioRepository = usuarioRepository;
         this.comentarioRepository = comentarioRepository;
-        this.request = request;
+        this.reacaoService = reacaoService;
     }
 
 
@@ -69,9 +67,9 @@ public class PostService {
         Usuario criador = obterUsuario(novoPostDTO.getIdUsuario());
 
         Post post = new Post();
-        post.setCriador(criador);
         post.setCriacao(LocalDateTime.now());
         post.setDescricao(novoPostDTO.getDescricao());
+        post.setReacoes(reacaoService.obterReacoesAtivas());
 
         if (imagem != null && !imagem.isEmpty()) {
             File arquivoUpado = uparArquivoServidor(imagem);
@@ -79,7 +77,8 @@ public class PostService {
             post.getArquivos().add(arquivo);
         }
 
-        postRepository.save(post);
+        criador.getPosts().add(post);
+        usuarioRepository.save(criador);
     }
 
     private File uparArquivoServidor(MultipartFile arquivo) {
@@ -179,13 +178,14 @@ public class PostService {
 
         List<Long> idsComentarios = mapearIdsComentarios(comentariosDTO);
 
+        //TODO
         List<Object[]> dadosReacoes = comentarioRepository.findReacoesByIdsComentarios(idsComentarios);
 
         for (Object[] dados : dadosReacoes) {
             Long idComentario = NumberUtils.castBigIntegerToLong(dados[0]);
             ComentarioDTO comentarioDTO = filtrarComentario(comentariosDTO, idComentario);
             if (comentarioDTO != null) {
-                comentarioDTO.getReacoes().add(new ReacaoDTO(dados));
+                //comentarioDTO.getReacoes().add(new ReacaoDTO(dados));
             }
         }
     }
@@ -203,5 +203,9 @@ public class PostService {
                 .stream()
                 .map(ComentarioDTO::getIdComentario)
                 .toList();
+    }
+
+    public Post getPostById(Long idPost) {
+        return postRepository.getById(idPost);
     }
 }
