@@ -22,8 +22,11 @@ public class Arquivo {
     @JoinColumn(name = "id_usuario_dono")
     private Usuario dono;
 
-    @Column(name = "nome", nullable = false)
-    private String nome;
+    @Column(name = "nome_real", nullable = false)
+    private String nomeReal;
+
+    @Column(name = "nome_codificado", nullable = false)
+    private String nomeCodificado;
 
     @Column(name = "caminho", nullable = false)
     private String caminho;
@@ -50,12 +53,20 @@ public class Arquivo {
         this.dono = dono;
     }
 
-    public String getNome() {
-        return nome;
+    public String getNomeReal() {
+        return nomeReal;
     }
 
-    public void setNome(String nome) {
-        this.nome = nome;
+    public void setNomeReal(String nome) {
+        this.nomeReal = nome;
+    }
+
+    public String getNomeCodificado() {
+        return nomeCodificado;
+    }
+
+    public void setNomeCodificado(String nomeCodificado) {
+        this.nomeCodificado = nomeCodificado;
     }
 
     public String getCaminho() {
@@ -87,11 +98,11 @@ public class Arquivo {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Arquivo arquivo = (Arquivo) o;
-        return Objects.equals(idArquivo, arquivo.idArquivo) && Objects.equals(nome, arquivo.nome) && Objects.equals(caminho, arquivo.caminho) && Objects.equals(tipo, arquivo.tipo) && Objects.equals(tamanho, arquivo.tamanho);
+        return Objects.equals(idArquivo, arquivo.idArquivo) && Objects.equals(nomeReal, arquivo.nomeReal) && Objects.equals(caminho, arquivo.caminho) && Objects.equals(tipo, arquivo.tipo) && Objects.equals(tamanho, arquivo.tamanho);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(idArquivo, nome, caminho, tipo, tamanho);
+        return Objects.hash(idArquivo, nomeReal, caminho, tipo, tamanho);
     }
 }
