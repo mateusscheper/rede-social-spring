@@ -29,6 +29,9 @@ public class Reacao {
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private Post post;
 
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private Comentario comentario;
+
     @Column(name = "tipo", nullable = false)
     private String tipo;
 
@@ -68,6 +71,14 @@ public class Reacao {
 
     public void setPost(Post post) {
         this.post = post;
+    }
+
+    public Comentario getComentario() {
+        return comentario;
+    }
+
+    public void setComentario(Comentario comentario) {
+        this.comentario = comentario;
     }
 
     public String getTipo() {

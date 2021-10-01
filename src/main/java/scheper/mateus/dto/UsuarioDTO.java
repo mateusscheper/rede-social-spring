@@ -2,7 +2,6 @@ package scheper.mateus.dto;
 
 import java.io.Serial;
 import java.io.Serializable;
-import java.math.BigInteger;
 import java.util.Objects;
 
 import static scheper.mateus.utils.NumberUtils.castBigIntegerToLong;

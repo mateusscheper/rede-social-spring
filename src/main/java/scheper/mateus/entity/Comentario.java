@@ -1,5 +1,6 @@
 package scheper.mateus.entity;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -30,12 +31,16 @@ public class Comentario {
     @JoinColumn(name = "id_post")
     private Post post;
 
+    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JoinColumn(name = "id_comentario_pai")
+    private Comentario comentarioPai;
+
     @Column(name = "criacao", nullable = false)
     private LocalDateTime criacao;
 
     private LocalDateTime exclusao;
 
-    @ManyToMany(fetch = FetchType.LAZY)
+    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinTable(name = "comentario_reacoes",
             schema = "api",
             joinColumns = {
@@ -85,6 +90,14 @@ public class Comentario {
 
     public void setPost(Post post) {
         this.post = post;
+    }
+
+    public Comentario getComentarioPai() {
+        return comentarioPai;
+    }
+
+    public void setComentarioPai(Comentario comentario) {
+        this.comentarioPai = comentario;
     }
 
     public LocalDateTime getCriacao() {

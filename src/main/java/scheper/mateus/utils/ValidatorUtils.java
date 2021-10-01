@@ -1,5 +1,6 @@
 package scheper.mateus.utils;
 
+import org.apache.commons.lang3.ObjectUtils;
 import scheper.mateus.exception.UsuarioBusinessException;
 
 import java.util.MissingResourceException;
@@ -11,8 +12,8 @@ public class ValidatorUtils {
         throw new UnsupportedOperationException();
     }
 
-    public static void validarNulo(Object object, String message) {
-        if (object == null) {
+    public static void validarNulo(String message, Object... object) {
+        if (ObjectUtils.allNull(object)) {
             if (message.startsWith("{") && message.endsWith("}")) {
                 String messageNoBraces = message.replace("{", "").replace("}", "");
                 try {

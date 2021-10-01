@@ -6,6 +6,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import static scheper.mateus.utils.NumberUtils.castBigIntegerToLong;
+
 public class ComentarioDTO implements Serializable {
 
     @Serial
@@ -23,15 +25,17 @@ public class ComentarioDTO implements Serializable {
 
     private List<ReacaoDTO> reacoes = new ArrayList<>();
 
+    private int quantidadeComentariosPost;
+
     public ComentarioDTO() {
     }
 
-    public ComentarioDTO(Long idComentario, Long idUsuario, String nomeUsuario, String fotoUsuario, String descricao) {
-        this.idComentario = idComentario;
-        this.idUsuario = idUsuario;
-        this.nomeUsuario = nomeUsuario;
-        this.fotoUsuario = fotoUsuario;
-        this.descricao = descricao;
+    public ComentarioDTO(Object[] dados) {
+        this.idComentario = castBigIntegerToLong(dados[0]);
+        this.idUsuario = castBigIntegerToLong(dados[1]);
+        this.nomeUsuario = (String) dados[2];
+        this.fotoUsuario = (String) dados[3];
+        this.descricao = (String) dados[4];
     }
 
     public Long getIdComentario() {
@@ -80,6 +84,14 @@ public class ComentarioDTO implements Serializable {
 
     public void setReacoes(List<ReacaoDTO> reacoes) {
         this.reacoes = reacoes;
+    }
+
+    public int getQuantidadeComentariosPost() {
+        return quantidadeComentariosPost;
+    }
+
+    public void setQuantidadeComentariosPost(int quantidadeComentariosPost) {
+        this.quantidadeComentariosPost = quantidadeComentariosPost;
     }
 
     @Override

@@ -6,19 +6,14 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-import scheper.mateus.dto.ComentarioDTO;
-import scheper.mateus.dto.NovoComentarioDTO;
 import scheper.mateus.dto.NovoPostDTO;
 import scheper.mateus.dto.PostDTO;
 import scheper.mateus.entity.Arquivo;
-import scheper.mateus.entity.Comentario;
 import scheper.mateus.entity.Post;
 import scheper.mateus.entity.Usuario;
 import scheper.mateus.exception.UsuarioBusinessException;
-import scheper.mateus.repository.ComentarioRepository;
 import scheper.mateus.repository.PostRepository;
 import scheper.mateus.repository.UsuarioRepository;
-import scheper.mateus.utils.NumberUtils;
 
 import javax.persistence.Transient;
 import java.io.File;
@@ -38,20 +33,17 @@ public class PostService {
 
     private final UsuarioRepository usuarioRepository;
 
-    private final ComentarioRepository comentarioRepository;
-
     private final ReacaoService reacaoService;
 
-    public PostService(PostRepository postRepository, UsuarioRepository usuarioRepository, ComentarioRepository comentarioRepository, ReacaoService reacaoService) {
+    public PostService(PostRepository postRepository, UsuarioRepository usuarioRepository, ReacaoService reacaoService) {
         this.postRepository = postRepository;
         this.usuarioRepository = usuarioRepository;
-        this.comentarioRepository = comentarioRepository;
         this.reacaoService = reacaoService;
     }
 
 
     public List<PostDTO> findPostsByIdUsuario(Long idUsuario) {
-        validarNulo(idUsuario, "ID de usuário inválido.");
+        validarNulo("ID de usuário inválido.", idUsuario);
 
         List<PostDTO> posts = new ArrayList<>();
         List<Object[]> dadosPosts = postRepository.findPostsByIdUsuario(idUsuario);
@@ -174,68 +166,10 @@ public class PostService {
     }
 
     private void validarNovoPost(NovoPostDTO novoPostDTO) {
-        validarNulo(novoPostDTO.getIdUsuario(), "ID de usuário inválida.");
+        validarNulo("ID de usuário inválida.", novoPostDTO.getIdUsuario());
     }
 
     private Usuario obterUsuario(Long idUsuario) {
         return usuarioRepository.findById(idUsuario).orElseThrow(() -> new UsuarioBusinessException("Usuário não encontrado."));
-    }
-
-    private Post obterPost(Long idPost) {
-        return postRepository.findById(idPost).orElseThrow(() -> new UsuarioBusinessException("Post não encontrado."));
-    }
-
-    public void saveComentario(NovoComentarioDTO novoComentarioDTO) {
-        Comentario comentario = new Comentario();
-        comentario.setCriador(obterUsuario(novoComentarioDTO.getIdUsuario()));
-        comentario.setPost(obterPost(novoComentarioDTO.getIdPost()));
-        comentario.setDescricao(novoComentarioDTO.getDescricao());
-        comentario.setCriacao(LocalDateTime.now());
-
-        comentarioRepository.save(comentario);
-    }
-
-    public List<ComentarioDTO> findComentariosByIdPost(Long idPost) {
-        validarNulo(idPost, "ID de post inválido.");
-        List<ComentarioDTO> comentariosDTO = comentarioRepository.findComentariosByIdPost(idPost);
-        popularReacoes(comentariosDTO);
-        return comentariosDTO;
-    }
-
-    private void popularReacoes(List<ComentarioDTO> comentariosDTO) {
-        if (comentariosDTO.isEmpty())
-            return;
-
-        List<Long> idsComentarios = mapearIdsComentarios(comentariosDTO);
-
-        //TODO
-        List<Object[]> dadosReacoes = comentarioRepository.findReacoesByIdsComentarios(idsComentarios);
-
-        for (Object[] dados : dadosReacoes) {
-            Long idComentario = NumberUtils.castBigIntegerToLong(dados[0]);
-            ComentarioDTO comentarioDTO = filtrarComentario(comentariosDTO, idComentario);
-            if (comentarioDTO != null) {
-                //comentarioDTO.getReacoes().add(new ReacaoDTO(dados));
-            }
-        }
-    }
-
-    private ComentarioDTO filtrarComentario(List<ComentarioDTO> comentariosDTO, Long idComentario) {
-        return comentariosDTO
-                .stream()
-                .filter(c -> c.getIdComentario().equals(idComentario))
-                .findFirst()
-                .orElse(null);
-    }
-
-    private List<Long> mapearIdsComentarios(List<ComentarioDTO> comentariosDTO) {
-        return comentariosDTO
-                .stream()
-                .map(ComentarioDTO::getIdComentario)
-                .toList();
-    }
-
-    public Post getPostById(Long idPost) {
-        return postRepository.getById(idPost);
     }
 }

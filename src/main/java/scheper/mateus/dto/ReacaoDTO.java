@@ -1,5 +1,8 @@
 package scheper.mateus.dto;
 
+import scheper.mateus.entity.Reacao;
+import scheper.mateus.enums.ReacaoEnum;
+
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.Objects;
@@ -18,6 +21,14 @@ public class ReacaoDTO implements Serializable {
     private Integer quantidade;
 
     private boolean marcado;
+
+    public ReacaoDTO(Reacao reacao, Long idUsuario) {
+        this.idReacao = reacao.getIdReacao();
+        this.marcado = reacaoPossuiUsuario(reacao, idUsuario);
+        this.nome = reacao.getTipo();
+        this.icone = obterPathIcone();
+        this.quantidade = reacao.getUsuarios().size();
+    }
 
     public Long getIdReacao() {
         return idReacao;
@@ -57,6 +68,23 @@ public class ReacaoDTO implements Serializable {
 
     public void setMarcado(boolean marcado) {
         this.marcado = marcado;
+    }
+
+    private boolean reacaoPossuiUsuario(Reacao reacao, Long idUsuario) {
+        return reacao.getUsuarios()
+                .stream()
+                .anyMatch(u -> u.getIdUsuario().equals(idUsuario));
+    }
+
+    private String obterPathIcone() {
+        ReacaoEnum reacaoEnum = ReacaoEnum.parse(this.nome);
+        if (reacaoEnum != null) {
+            if (this.marcado)
+                return reacaoEnum.getIconeMarcado();
+            else
+                return reacaoEnum.getIcone();
+        }
+        return null;
     }
 
     @Override

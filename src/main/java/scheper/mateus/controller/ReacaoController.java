@@ -1,10 +1,10 @@
 package scheper.mateus.controller;
 
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import scheper.mateus.dto.ReacaoDTO;
 import scheper.mateus.dto.ReagirDTO;
@@ -28,8 +28,10 @@ public class ReacaoController {
         reacaoService.reagir(reagirDTO);
     }
 
-    @GetMapping("/post/{idPost}/usuario/{idUsuario}")
-    public List<ReacaoDTO> obterReacoesByIdPostAndIdUsuario(@PathVariable("idPost") Long idPost, @PathVariable("idUsuario") Long idUsuario) {
-        return reacaoService.obterReacoesByIdPost(idPost, idUsuario);
+    @GetMapping()
+    public List<ReacaoDTO> obterReacoes(@RequestParam(value = "idPost", required = false) Long idPost,
+                                        @RequestParam(value = "idComentario", required = false) Long idComentario,
+                                        @RequestParam("idUsuario") Long idUsuario) {
+        return reacaoService.obterReacoes(idPost, idComentario, idUsuario);
     }
 }

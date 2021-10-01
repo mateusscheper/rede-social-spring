@@ -4,7 +4,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
-import scheper.mateus.dto.ComentarioDTO;
 import scheper.mateus.entity.Comentario;
 
 import java.util.List;
@@ -12,16 +11,23 @@ import java.util.List;
 @Repository
 public interface ComentarioRepository extends JpaRepository<Comentario, Long> {
 
-    @Query(value = "SELECT new scheper.mateus.dto.ComentarioDTO(c.idComentario, " +
-            "c.criador.idUsuario, " +
-            "c.criador.nome, " +
-            "COALESCE(f.caminho, 'assets/nopic.png'), " +
-            "c.descricao) " +
-            "FROM Comentario c " +
-            "LEFT JOIN c.criador.foto f " +
-            "WHERE c.post.idPost = :idPost")
-    List<ComentarioDTO> findComentariosByIdPost(@Param("idPost") Long idPost);
+    @Query(value = "SELECT c.id_comentario, " +
+            "       u.id_usuario, " +
+            "       u.nome, " +
+            "       COALESCE(a.caminho, 'assets/nopic.png'), " +
+            "       c.descricao " +
+            "FROM api.comentario c " +
+            "         JOIN api.usuario u ON c.id_usuario_criador = u.id_usuario " +
+            "         LEFT JOIN api.arquivo a ON u.id_arquivo_foto = a.id_arquivo " +
+            "WHERE c.id_post = :idPost " +
+            "ORDER BY c.criacao DESC " +
+            "LIMIT :limit", nativeQuery = true)
+    List<Object[]> findComentariosByIdPost(@Param("idPost") Long idPost, @Param("limit") Integer limit);
 
+    @Query(value = "SELECT count(c) " +
+            "FROM api.comentario c " +
+            "WHERE c.id_post = :idPost", nativeQuery = true)
+    int countComentariosByPost(@Param("idPost") Long idPost);
 
     @Query(value = "SELECT comentario_reacoes.id_comentario, " +
             "       reacao.tipo, " +

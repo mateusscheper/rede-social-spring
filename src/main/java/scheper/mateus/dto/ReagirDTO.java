@@ -16,8 +16,9 @@ public class ReagirDTO implements Serializable {
     @NotNull(message = "{reacao.validacao.marcado}")
     private boolean marcado;
 
-    @NotNull(message = "{reacao.validacao.post")
     private Long idPost;
+
+    private Long idComentario;
 
     @NotNull(message = "{reacao.validacao.reacao")
     private Long idReacao;
@@ -25,10 +26,11 @@ public class ReagirDTO implements Serializable {
     public ReagirDTO() {
     }
 
-    public ReagirDTO(Long idUsuario, boolean marcado, Long idPost, Long idReacao) {
+    public ReagirDTO(Long idUsuario, boolean marcado, Long idPost, Long idComentario, Long idReacao) {
         this.idUsuario = idUsuario;
         this.marcado = marcado;
         this.idPost = idPost;
+        this.idComentario = idComentario;
         this.idReacao = idReacao;
     }
 
@@ -54,6 +56,14 @@ public class ReagirDTO implements Serializable {
 
     public void setIdPost(Long idPost) {
         this.idPost = idPost;
+    }
+
+    public Long getIdComentario() {
+        return idComentario;
+    }
+
+    public void setIdComentario(Long idComentario) {
+        this.idComentario = idComentario;
     }
 
     public Long getIdReacao() {

@@ -21,14 +21,14 @@ public class UsuarioService {
     }
 
     public List<UsuarioDTO> findAmigosByIdUsuario(Long idUsuario) {
-        validarNulo(idUsuario, "ID de usuário não pode ser nulo.");
+        validarNulo("ID de usuário não pode ser nulo.", idUsuario);
         return usuarioRepository.findAmigosByIdUsuario(idUsuario);
     }
 
     public UsuarioDTO findUsuarioByIdUsuario(Long idUsuario) {
-        validarNulo(idUsuario, "ID de usuário não pode ser nulo.");
+        validarNulo("ID de usuário não pode ser nulo.", idUsuario);
         UsuarioDTO usuarioDTO = usuarioRepository.findUsuarioByIdUsuario(idUsuario);
-        validarNulo(usuarioDTO, "Usuário não encontrado.");
+        validarNulo("Usuário não encontrado.", usuarioDTO);
 
         return usuarioDTO;
     }
