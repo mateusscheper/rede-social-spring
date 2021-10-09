@@ -1,5 +1,7 @@
 package scheper.mateus.dto;
 
+import scheper.mateus.entity.Usuario;
+
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.Objects;
@@ -33,6 +35,12 @@ public class UsuarioDTO implements Serializable {
             this.nome = (String) dadosPost[4];
             this.foto = (String) dadosPost[5];
         }
+    }
+
+    public UsuarioDTO(Usuario usuario) {
+        this.idUsuario = usuario.getIdUsuario();
+        this.nome = usuario.getNome();
+        this.foto = usuario.getFoto() != null ? usuario.getFoto().getCaminho() : "assets/nopic.png";
     }
 
     public Long getIdUsuario() {

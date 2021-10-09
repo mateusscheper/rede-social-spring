@@ -4,7 +4,7 @@ import org.springframework.stereotype.Service;
 import scheper.mateus.dto.NovoUsuarioDTO;
 import scheper.mateus.dto.UsuarioDTO;
 import scheper.mateus.entity.Usuario;
-import scheper.mateus.exception.UsuarioBusinessException;
+import scheper.mateus.exception.BusinessException;
 import scheper.mateus.repository.UsuarioRepository;
 
 import java.util.List;
@@ -35,7 +35,7 @@ public class UsuarioService {
 
     public NovoUsuarioDTO save(NovoUsuarioDTO novoUsuarioDTO) {
         if (usuarioRepository.existsByEmail(novoUsuarioDTO.getEmail()))
-            throw new UsuarioBusinessException("{usuario.validacao.emailJaCadastrado}");
+            throw new BusinessException("{usuario.validacao.emailJaCadastrado}");
 
         Usuario usuario = new Usuario(novoUsuarioDTO);
         usuarioRepository.save(usuario);

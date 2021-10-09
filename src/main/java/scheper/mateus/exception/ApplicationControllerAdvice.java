@@ -17,9 +17,9 @@ import java.util.ResourceBundle;
 @RestControllerAdvice
 public class ApplicationControllerAdvice {
 
-    @ExceptionHandler(UsuarioBusinessException.class)
+    @ExceptionHandler(BusinessException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ApiErrors handleException(UsuarioBusinessException e) {
+    public ApiErrors handleException(BusinessException e) {
         String message = e.getMessage();
 
         if (message.startsWith("{") && message.endsWith("}")) {

@@ -1,7 +1,7 @@
 package scheper.mateus.utils;
 
 import org.apache.commons.lang3.ObjectUtils;
-import scheper.mateus.exception.UsuarioBusinessException;
+import scheper.mateus.exception.BusinessException;
 
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
@@ -23,7 +23,7 @@ public class ValidatorUtils {
                 }
             }
 
-            throw new UsuarioBusinessException(message);
+            throw new BusinessException(message);
         }
     }
 }

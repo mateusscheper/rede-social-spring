@@ -9,7 +9,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import scheper.mateus.dto.NovoUsuarioDTO;
+import scheper.mateus.dto.PostDTO;
 import scheper.mateus.dto.UsuarioDTO;
+import scheper.mateus.service.PostService;
 import scheper.mateus.service.UsuarioService;
 
 import javax.validation.Valid;
@@ -20,9 +22,11 @@ import java.util.List;
 public class UsuarioController {
 
     private final UsuarioService usuarioService;
+    private final PostService postService;
 
-    public UsuarioController(UsuarioService usuarioService) {
+    public UsuarioController(UsuarioService usuarioService, PostService postService) {
         this.usuarioService = usuarioService;
+        this.postService = postService;
     }
 
     @GetMapping("/{idUsuario}")
@@ -43,4 +47,9 @@ public class UsuarioController {
         return usuarioService.findAmigosByIdUsuario(idUsuario);
     }
 
+    @GetMapping("/{idUsuario}/post")
+    @ResponseStatus(HttpStatus.OK)
+    public List<PostDTO> findPostsByIdUsuario(@PathVariable("idUsuario") Long idUsuario) {
+        return postService.findPostsByIdUsuario(idUsuario);
+    }
 }

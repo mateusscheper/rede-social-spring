@@ -6,12 +6,16 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import scheper.mateus.dto.ComentarioDTO;
 import scheper.mateus.dto.NovoPostDTO;
+import scheper.mateus.dto.PostCompletoDTO;
 import scheper.mateus.dto.PostDTO;
+import scheper.mateus.dto.UsuarioDTO;
 import scheper.mateus.entity.Arquivo;
 import scheper.mateus.entity.Post;
 import scheper.mateus.entity.Usuario;
-import scheper.mateus.exception.UsuarioBusinessException;
+import scheper.mateus.exception.BusinessException;
+import scheper.mateus.repository.ComentarioRepository;
 import scheper.mateus.repository.PostRepository;
 import scheper.mateus.repository.UsuarioRepository;
 
@@ -33,12 +37,18 @@ public class PostService {
 
     private final UsuarioRepository usuarioRepository;
 
+    private final ComentarioRepository comentarioRepository;
+
     private final ReacaoService reacaoService;
 
-    public PostService(PostRepository postRepository, UsuarioRepository usuarioRepository, ReacaoService reacaoService) {
+    private final ComentarioService comentarioService;
+
+    public PostService(PostRepository postRepository, UsuarioRepository usuarioRepository, ComentarioRepository comentarioRepository, ReacaoService reacaoService, ComentarioService comentarioService) {
         this.postRepository = postRepository;
         this.usuarioRepository = usuarioRepository;
+        this.comentarioRepository = comentarioRepository;
         this.reacaoService = reacaoService;
+        this.comentarioService = comentarioService;
     }
 
 
@@ -60,6 +70,7 @@ public class PostService {
         Usuario criador = obterUsuario(novoPostDTO.getIdUsuario());
 
         Post post = new Post();
+        post.setUsuario(criador);
         post.setCriacao(LocalDateTime.now());
         post.setDescricao(novoPostDTO.getDescricao());
         post.setReacoes(reacaoService.obterReacoesAtivas());
@@ -92,7 +103,7 @@ public class PostService {
             String pastaUpload = System.getProperty("user.home") + separator() + "uploads" + separator() + "post" + separator();
 
             if (!new File(pastaUpload).exists()) {
-                new File(pastaUpload).mkdir();
+                new File(pastaUpload).mkdirs();
             }
 
             File arquivoReal = criarArquivoFisico(nomeArquivoCodificado, pastaUpload, idUsuario);
@@ -101,7 +112,7 @@ public class PostService {
 
             return arquivoReal;
         } catch (IOException e) {
-            throw new UsuarioBusinessException("Arquivo inválido.");
+            throw new BusinessException("Arquivo inválido.");
         }
     }
 
@@ -135,7 +146,7 @@ public class PostService {
 
             return arquivo;
         } catch (IOException e) {
-            throw new UsuarioBusinessException("Arquivo inválido.");
+            throw new BusinessException("Arquivo inválido.");
         }
     }
 
@@ -149,7 +160,7 @@ public class PostService {
 
     private NovoPostDTO obterNovoPostDTODoRequest(String post) {
         if (StringUtils.isEmpty(post)) {
-            throw new UsuarioBusinessException("Dados inválidos.");
+            throw new BusinessException("Dados inválidos.");
         }
 
         ObjectMapper mapper = new ObjectMapper();
@@ -157,7 +168,7 @@ public class PostService {
         try {
             novoPostDTO = mapper.readValue(post, NovoPostDTO.class);
         } catch (JsonProcessingException e) {
-            throw new UsuarioBusinessException("Dados inválidos.");
+            throw new BusinessException("Dados inválidos.");
         }
 
         validarNovoPost(novoPostDTO);
@@ -170,6 +181,27 @@ public class PostService {
     }
 
     private Usuario obterUsuario(Long idUsuario) {
-        return usuarioRepository.findById(idUsuario).orElseThrow(() -> new UsuarioBusinessException("Usuário não encontrado."));
+        return usuarioRepository.findById(idUsuario).orElseThrow(() -> new BusinessException("Usuário não encontrado."));
+    }
+
+    public PostCompletoDTO findPostById(Long idPost, Long idUsuario) {
+        validarNulo("ID de post inválido.", idPost);
+        validarNulo("ID de usuário inválido.", idUsuario);
+
+        Post post = postRepository.findById(idPost).orElseThrow(() -> new BusinessException("Post não encontrado."));
+
+        PostCompletoDTO postDTO = new PostCompletoDTO();
+        postDTO.setIdPost(post.getIdPost());
+        postDTO.setCriacao(post.getCriacao());
+        postDTO.setCriador(new UsuarioDTO(post.getUsuario()));
+        postDTO.setDescricao(post.getDescricao());
+        postDTO.setArquivo(!post.getArquivos().isEmpty() ? post.getArquivos().get(0).getCaminho() : null);
+
+        List<Object[]> dadosComentarios = comentarioRepository.findComentariosByIdPost(idPost, 100);
+        dadosComentarios.forEach(dados -> postDTO.getComentarios().add(new ComentarioDTO(dados)));
+
+        comentarioService.popularReacoes(postDTO.getComentarios(), idUsuario);
+
+        return postDTO;
     }
 }

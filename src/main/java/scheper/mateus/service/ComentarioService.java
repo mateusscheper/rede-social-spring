@@ -8,7 +8,7 @@ import scheper.mateus.entity.Comentario;
 import scheper.mateus.entity.Post;
 import scheper.mateus.entity.Reacao;
 import scheper.mateus.entity.Usuario;
-import scheper.mateus.exception.UsuarioBusinessException;
+import scheper.mateus.exception.BusinessException;
 import scheper.mateus.repository.ComentarioRepository;
 import scheper.mateus.repository.PostRepository;
 import scheper.mateus.repository.UsuarioRepository;
@@ -63,10 +63,10 @@ public class ComentarioService {
     }
 
     private Post obterPost(Long idPost) {
-        return postRepository.findById(idPost).orElseThrow(() -> new UsuarioBusinessException("Post não encontrado."));
+        return postRepository.findById(idPost).orElseThrow(() -> new BusinessException("Post não encontrado."));
     }
 
-    private void popularReacoes(List<ComentarioDTO> comentariosDTO, Long idUsuario) {
+    public void popularReacoes(List<ComentarioDTO> comentariosDTO, Long idUsuario) {
         for (ComentarioDTO comentarioDTO : comentariosDTO) {
             Comentario comentario = comentarioRepository.getById(comentarioDTO.getIdComentario());
             for (Reacao reacao : comentario.getReacoes()) {
@@ -77,6 +77,6 @@ public class ComentarioService {
     }
 
     private Usuario obterUsuario(Long idUsuario) {
-        return usuarioRepository.findById(idUsuario).orElseThrow(() -> new UsuarioBusinessException("Usuário não encontrado."));
+        return usuarioRepository.findById(idUsuario).orElseThrow(() -> new BusinessException("Usuário não encontrado."));
     }
 }
