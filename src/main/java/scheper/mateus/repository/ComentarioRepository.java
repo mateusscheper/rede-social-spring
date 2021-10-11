@@ -22,12 +22,12 @@ public interface ComentarioRepository extends JpaRepository<Comentario, Long> {
             "WHERE c.id_post = :idPost " +
             "ORDER BY c.criacao DESC " +
             "LIMIT :limit", nativeQuery = true)
-    List<Object[]> findComentariosByIdPost(@Param("idPost") Long idPost, @Param("limit") Integer limit);
+    List<Object[]> findComentariosPorIdPost(@Param("idPost") Long idPost, @Param("limit") Integer limit);
 
     @Query(value = "SELECT count(c) " +
             "FROM api.comentario c " +
             "WHERE c.id_post = :idPost", nativeQuery = true)
-    int countComentariosByPost(@Param("idPost") Long idPost);
+    int countComentariosPorIdPost(@Param("idPost") Long idPost);
 
     @Query(value = "SELECT comentario_reacoes.id_comentario, " +
             "       reacao.tipo, " +
@@ -39,5 +39,18 @@ public interface ComentarioRepository extends JpaRepository<Comentario, Long> {
             "         JOIN api.usuario ON reacao_usuarios.id_usuario = usuario.id_usuario " +
             "WHERE comentario_reacoes.id_comentario IN (:idsComentarios) " +
             "ORDER BY api.reacao.tipo, api.usuario.nome", nativeQuery = true)
-    List<Object[]> findReacoesByIdsComentarios(List<Long> idsComentarios);
+    List<Object[]> findReacoesPorIdsComentarios(List<Long> idsComentarios);
+
+    @Query(value = "SELECT c.id_comentario, " +
+            "       u.id_usuario, " +
+            "       u.nome, " +
+            "       COALESCE(a.caminho, 'assets/nopic.png'), " +
+            "       c.descricao, " +
+            "       c.id_comentario_pai " +
+            "FROM api.comentario c " +
+            "         JOIN api.usuario u ON c.id_usuario_criador = u.id_usuario " +
+            "         LEFT JOIN api.arquivo a ON u.id_arquivo_foto = a.id_arquivo " +
+            "WHERE c.id_comentario_pai IN (:idsComentario) " +
+            "ORDER BY c.criacao DESC", nativeQuery = true)
+    List<Object[]> findSubcomentariosPorIdsComentario(List<Long> idsComentario);
 }

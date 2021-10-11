@@ -29,9 +29,9 @@ public class ReacaoController {
     }
 
     @GetMapping()
-    public List<ReacaoDTO> obterReacoes(@RequestParam(value = "idPost", required = false) Long idPost,
-                                        @RequestParam(value = "idComentario", required = false) Long idComentario,
-                                        @RequestParam("idUsuario") Long idUsuario) {
-        return reacaoService.obterReacoes(idPost, idComentario, idUsuario);
+    public List<ReacaoDTO> findReacoesPorIdPostOuIdComentario(@RequestParam(value = "idPost", required = false) Long idPost,
+                                                              @RequestParam(value = "idComentario", required = false) Long idComentario,
+                                                              @RequestParam("idUsuario") Long idUsuario) {
+        return reacaoService.findReacoesPorIdPostOuIdComentario(idPost, idComentario, idUsuario);
     }
 }

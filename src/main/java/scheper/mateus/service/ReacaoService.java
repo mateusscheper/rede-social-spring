@@ -57,13 +57,12 @@ public class ReacaoService {
         }
 
         if (isMarcacaoDiferente(reagirDTO.isMarcado(), reacao, idUsuario)) {
-            Usuario usuario = usuarioService.findUsuarioById(idUsuario);
+            Usuario usuario = usuarioService.findUsuarioPorIdUsuario(idUsuario);
             if (reacaoPossuiUsuario(reacao, idUsuario)) {
                 reacao.getUsuarios().removeIf(u -> u.getIdUsuario().equals(idUsuario));
             } else {
                 if (!reacao.getUsuarios().contains(usuario))
                     reacao.getUsuarios().add(usuario);
-
                 desmarcarOutrasReacoes(post, comentario, reagirDTO.getIdReacao(), idUsuario);
             }
 
@@ -130,7 +129,7 @@ public class ReacaoService {
                 .anyMatch(u -> u.getIdUsuario().equals(idUsuario));
     }
 
-    public List<ReacaoDTO> obterReacoes(Long idPost, Long idComentario, Long idUsuario) {
+    public List<ReacaoDTO> findReacoesPorIdPostOuIdComentario(Long idPost, Long idComentario, Long idUsuario) {
         List<ReacaoDTO> reacoesDTO = new ArrayList<>();
         validarNulo("ID de post inválido.", idPost, idComentario);
 

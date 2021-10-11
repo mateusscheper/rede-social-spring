@@ -14,8 +14,9 @@ public class NovoComentarioDTO implements Serializable {
     @NotNull(message = "{comentario.validacao.usuario}")
     private Long idUsuario;
 
-    @NotNull(message = "{comentario.validacao.post}")
     private Long idPost;
+
+    private Long idComentario;
 
     @NotEmpty(message = "{comentario.validacao.descricao}")
     private String descricao;
@@ -23,9 +24,10 @@ public class NovoComentarioDTO implements Serializable {
     public NovoComentarioDTO() {
     }
 
-    public NovoComentarioDTO(Long idUsuario, Long idPost, String descricao) {
+    public NovoComentarioDTO(Long idUsuario, Long idPost, Long idComentario, String descricao) {
         this.idUsuario = idUsuario;
         this.idPost = idPost;
+        this.idComentario = idComentario;
         this.descricao = descricao;
     }
 
@@ -53,16 +55,24 @@ public class NovoComentarioDTO implements Serializable {
         this.descricao = descricao;
     }
 
+    public Long getIdComentario() {
+        return idComentario;
+    }
+
+    public void setIdComentario(Long idComentario) {
+        this.idComentario = idComentario;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         NovoComentarioDTO that = (NovoComentarioDTO) o;
-        return Objects.equals(idUsuario, that.idUsuario) && Objects.equals(idPost, that.idPost) && Objects.equals(descricao, that.descricao);
+        return Objects.equals(idUsuario, that.idUsuario) && Objects.equals(idPost, that.idPost) && Objects.equals(idComentario, that.idComentario) && Objects.equals(descricao, that.descricao);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(idUsuario, idPost, descricao);
+        return Objects.hash(idUsuario, idPost, idComentario, descricao);
     }
 }

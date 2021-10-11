@@ -20,21 +20,19 @@ public class UsuarioService {
         this.usuarioRepository = usuarioRepository;
     }
 
-    public List<UsuarioDTO> findAmigosByIdUsuario(Long idUsuario) {
+    public UsuarioDTO findUsuarioDTOPorIdUsuario(Long idUsuario) {
         validarNulo("ID de usuário não pode ser nulo.", idUsuario);
-        return usuarioRepository.findAmigosByIdUsuario(idUsuario);
-    }
-
-    public UsuarioDTO findUsuarioByIdUsuario(Long idUsuario) {
-        validarNulo("ID de usuário não pode ser nulo.", idUsuario);
-        UsuarioDTO usuarioDTO = usuarioRepository.findUsuarioByIdUsuario(idUsuario);
+        UsuarioDTO usuarioDTO = usuarioRepository.findUsuarioPorIdUsuario(idUsuario);
         validarNulo("Usuário não encontrado.", usuarioDTO);
-
         return usuarioDTO;
     }
 
+    public Usuario findUsuarioPorIdUsuario(Long idUsuario) {
+        return usuarioRepository.getById(idUsuario);
+    }
+
     public NovoUsuarioDTO save(NovoUsuarioDTO novoUsuarioDTO) {
-        if (usuarioRepository.existsByEmail(novoUsuarioDTO.getEmail()))
+        if (usuarioRepository.existsPorEmail(novoUsuarioDTO.getEmail()))
             throw new BusinessException("{usuario.validacao.emailJaCadastrado}");
 
         Usuario usuario = new Usuario(novoUsuarioDTO);
@@ -43,9 +41,5 @@ public class UsuarioService {
         novoUsuarioDTO.setIdUsuario(usuario.getIdUsuario());
         novoUsuarioDTO.setEmail(usuario.getEmail());
         return novoUsuarioDTO;
-    }
-
-    public Usuario findUsuarioById(Long idUsuario) {
-        return usuarioRepository.getById(idUsuario);
     }
 }

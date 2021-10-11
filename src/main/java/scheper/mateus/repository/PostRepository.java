@@ -45,5 +45,5 @@ public interface PostRepository extends JpaRepository<Post, Long> {
             "FROM posts " +
             "ORDER BY criacao DESC",
             nativeQuery = true)
-    List<Object[]> findPostsByIdUsuario(@Param("idUsuario") Long idUsuario);
+    List<Object[]> findPostsPorIdUsuario(@Param("idUsuario") Long idUsuario);
 }

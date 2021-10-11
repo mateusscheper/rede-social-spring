@@ -22,6 +22,8 @@ public class PostCompletoDTO implements Serializable {
 
     private LocalDateTime criacao;
 
+    private List<ReacaoDTO> reacoes = new ArrayList<>();
+
     private List<ComentarioDTO> comentarios = new ArrayList<>();
 
     public Long getIdPost() {
@@ -62,6 +64,14 @@ public class PostCompletoDTO implements Serializable {
 
     public void setCriacao(LocalDateTime criacao) {
         this.criacao = criacao;
+    }
+
+    public List<ReacaoDTO> getReacoes() {
+        return reacoes;
+    }
+
+    public void setReacoes(List<ReacaoDTO> reacoes) {
+        this.reacoes = reacoes;
     }
 
     public List<ComentarioDTO> getComentarios() {

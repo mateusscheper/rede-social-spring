@@ -25,6 +25,8 @@ public class ComentarioDTO implements Serializable {
 
     private List<ReacaoDTO> reacoes = new ArrayList<>();
 
+    private List<ComentarioDTO> subcomentarios = new ArrayList<>();
+
     private int quantidadeComentariosPost;
 
     public ComentarioDTO() {
@@ -80,6 +82,14 @@ public class ComentarioDTO implements Serializable {
 
     public List<ReacaoDTO> getReacoes() {
         return reacoes;
+    }
+
+    public List<ComentarioDTO> getSubcomentarios() {
+        return subcomentarios;
+    }
+
+    public void setSubcomentarios(List<ComentarioDTO> subcomentarios) {
+        this.subcomentarios = subcomentarios;
     }
 
     public void setReacoes(List<ReacaoDTO> reacoes) {

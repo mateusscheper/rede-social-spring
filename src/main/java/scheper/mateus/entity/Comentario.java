@@ -27,7 +27,7 @@ public class Comentario {
     @JoinColumn(name = "id_usuario_criador")
     private Usuario criador;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_post")
     private Post post;
 
