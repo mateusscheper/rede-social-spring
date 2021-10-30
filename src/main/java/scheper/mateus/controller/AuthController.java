@@ -4,7 +4,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import scheper.mateus.dto.LoginRegistroDTO;
 import scheper.mateus.dto.NovoUsuarioDTO;
-import scheper.mateus.dto.TokenDTO;
+import scheper.mateus.dto.LoginDTO;
 import scheper.mateus.service.AuthService;
 
 import javax.validation.Valid;
@@ -21,7 +21,7 @@ public class AuthController {
 
     @PostMapping("/login")
     @ResponseStatus(HttpStatus.OK)
-    public TokenDTO login(@RequestBody @Valid LoginRegistroDTO loginDTO) {
+    public LoginDTO login(@RequestBody @Valid LoginRegistroDTO loginDTO) {
         return authService.login(loginDTO);
     }
 

@@ -6,7 +6,8 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
-import scheper.mateus.dto.TokenDTO;
+import scheper.mateus.dto.LoginDTO;
+import scheper.mateus.dto.UsuarioSimplesDTO;
 import scheper.mateus.entity.Usuario;
 
 import java.time.LocalDateTime;
@@ -24,7 +25,7 @@ public class JwtService {
     @Value(value = "${jwt.security.chave}")
     private String chaveAssinatura;
 
-    public TokenDTO gerarToken(Usuario usuario) {
+    public LoginDTO gerarToken(Usuario usuario) {
         long tempoExpiracao = Long.parseLong(expiracao);
         LocalDateTime dataHoraExpiracao = LocalDateTime.now().plusMinutes(tempoExpiracao);
 
@@ -39,7 +40,7 @@ public class JwtService {
                 .signWith(SignatureAlgorithm.HS512, chaveAssinatura)
                 .compact();
 
-        return new TokenDTO(usuario.getIdUsuario(), token);
+        return new LoginDTO(new UsuarioSimplesDTO(usuario), token);
     }
 
     public Claims obterClaims(String token) {

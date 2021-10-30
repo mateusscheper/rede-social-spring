@@ -4,7 +4,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import scheper.mateus.dto.LoginRegistroDTO;
 import scheper.mateus.dto.NovoUsuarioDTO;
-import scheper.mateus.dto.TokenDTO;
+import scheper.mateus.dto.LoginDTO;
 import scheper.mateus.entity.Usuario;
 import scheper.mateus.exception.BusinessException;
 import scheper.mateus.repository.UsuarioRepository;
@@ -34,7 +34,7 @@ public class AuthService {
         usuarioRepository.save(usuario);
     }
 
-    public TokenDTO login(LoginRegistroDTO loginDTO) {
+    public LoginDTO login(LoginRegistroDTO loginDTO) {
         Usuario usuario = usuarioRepository.findByEmail(loginDTO.getEmail());
         if (usuario == null)
             throw new BusinessException("{usuario.validacao.emailOuSenhaInvalidos}");

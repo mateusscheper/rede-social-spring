@@ -4,29 +4,26 @@ import java.io.Serial;
 import java.io.Serializable;
 import java.util.Objects;
 
-public class TokenDTO implements Serializable {
+public class LoginDTO implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
 
-    private Long idUsuario;
+    private UsuarioSimplesDTO usuario;
 
     private String token;
 
-    public TokenDTO() {
-    }
-
-    public TokenDTO(Long idUsuario, String token) {
-        this.idUsuario = idUsuario;
+    public LoginDTO(UsuarioSimplesDTO usuario, String token) {
+        this.usuario = usuario;
         this.token = token;
     }
 
-    public Long getIdUsuario() {
-        return idUsuario;
+    public UsuarioSimplesDTO getUsuario() {
+        return usuario;
     }
 
-    public void setIdUsuario(Long idUsuario) {
-        this.idUsuario = idUsuario;
+    public void setUsuario(UsuarioSimplesDTO usuario) {
+        this.usuario = usuario;
     }
 
     public String getToken() {
@@ -41,12 +38,12 @@ public class TokenDTO implements Serializable {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        TokenDTO tokenDTO = (TokenDTO) o;
-        return Objects.equals(idUsuario, tokenDTO.idUsuario) && Objects.equals(token, tokenDTO.token);
+        LoginDTO loginDTO = (LoginDTO) o;
+        return Objects.equals(usuario, loginDTO.usuario) && Objects.equals(token, loginDTO.token);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(idUsuario, token);
+        return Objects.hash(usuario, token);
     }
 }
