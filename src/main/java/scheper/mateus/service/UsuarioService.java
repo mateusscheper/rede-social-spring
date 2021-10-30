@@ -1,18 +1,18 @@
 package scheper.mateus.service;
 
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-import scheper.mateus.dto.NovoUsuarioDTO;
 import scheper.mateus.dto.UsuarioDTO;
 import scheper.mateus.entity.Usuario;
-import scheper.mateus.exception.BusinessException;
 import scheper.mateus.repository.UsuarioRepository;
-
-import java.util.List;
 
 import static scheper.mateus.utils.ValidatorUtils.validarNulo;
 
 @Service
-public class UsuarioService {
+public class UsuarioService implements UserDetailsService {
 
     private final UsuarioRepository usuarioRepository;
 
@@ -31,15 +31,17 @@ public class UsuarioService {
         return usuarioRepository.getById(idUsuario);
     }
 
-    public NovoUsuarioDTO save(NovoUsuarioDTO novoUsuarioDTO) {
-        if (usuarioRepository.existsPorEmail(novoUsuarioDTO.getEmail()))
-            throw new BusinessException("{usuario.validacao.emailJaCadastrado}");
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        Usuario usuario = usuarioRepository.findByEmail(username);
+        if (usuario == null)
+            throw new UsernameNotFoundException("Usuário não encontrado.");
 
-        Usuario usuario = new Usuario(novoUsuarioDTO);
-        usuarioRepository.save(usuario);
-
-        novoUsuarioDTO.setIdUsuario(usuario.getIdUsuario());
-        novoUsuarioDTO.setEmail(usuario.getEmail());
-        return novoUsuarioDTO;
+        return User
+                .builder()
+                .username(usuario.getEmail())
+                .password(usuario.getSenha())
+                .roles("USER")
+                .build();
     }
 }

@@ -37,6 +37,9 @@ public class Usuario {
     @Column(name = "email", nullable = false, unique = true)
     private String email;
 
+    @Column(name = "senha", nullable = false)
+    private String senha;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_arquivo_foto")
     private Arquivo foto;
@@ -75,7 +78,7 @@ public class Usuario {
     public Usuario(NovoUsuarioDTO novoUsuarioDTO) {
         this.nome = novoUsuarioDTO.getNome().trim();
         this.email = novoUsuarioDTO.getEmail().toLowerCase().trim();
-        this.dataNascimento = novoUsuarioDTO.getDataNascimento();
+        this.senha = novoUsuarioDTO.getSenha();
     }
 
     public Long getIdUsuario() {
@@ -100,6 +103,14 @@ public class Usuario {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public String getSenha() {
+        return senha;
+    }
+
+    public void setSenha(String senha) {
+        this.senha = senha;
     }
 
     public Arquivo getFoto() {

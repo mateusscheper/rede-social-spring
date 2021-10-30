@@ -7,8 +7,6 @@ import org.springframework.stereotype.Repository;
 import scheper.mateus.dto.UsuarioDTO;
 import scheper.mateus.entity.Usuario;
 
-import java.util.List;
-
 @Repository
 public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
 
@@ -20,4 +18,7 @@ public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
 
     @Query(value = "SELECT EXISTS(SELECT 1 FROM api.usuario WHERE api.usuario.email = :email)", nativeQuery = true)
     boolean existsPorEmail(String email);
+
+    @Query(value = "SELECT u FROM Usuario u WHERE u.email = :email")
+    Usuario findByEmail(@Param("email") String email);
 }
