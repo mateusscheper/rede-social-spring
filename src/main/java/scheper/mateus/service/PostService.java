@@ -5,11 +5,16 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.util.ObjectUtils;
 import org.springframework.web.multipart.MultipartFile;
-import scheper.mateus.dto.*;
+import scheper.mateus.dto.ComentarioDTO;
+import scheper.mateus.dto.NovoPostDTO;
+import scheper.mateus.dto.PostCompletoDTO;
+import scheper.mateus.dto.PostDTO;
+import scheper.mateus.dto.ReacaoDTO;
+import scheper.mateus.dto.UsuarioDTO;
 import scheper.mateus.entity.Arquivo;
 import scheper.mateus.entity.Post;
-import scheper.mateus.entity.Reacao;
 import scheper.mateus.entity.Usuario;
 import scheper.mateus.exception.BusinessException;
 import scheper.mateus.repository.ComentarioRepository;
@@ -68,12 +73,36 @@ public class PostService {
 
     private void uparEAdicionarArquivoAoPost(MultipartFile imagem, Usuario criador, Post post) {
         if (imagem != null && !imagem.isEmpty()) {
+            validarTipoArquivo(imagem);
             String nomeArquivoCodificado = getNomeArquivoCodificado(imagem, criador);
             String nomeReal = imagem.getOriginalFilename() != null ? imagem.getOriginalFilename() : imagem.getName();
             File arquivoUpado = uparArquivoServidor(imagem, nomeArquivoCodificado, criador.getIdUsuario());
             Arquivo arquivo = criarArquivo(arquivoUpado, criador, nomeReal, nomeArquivoCodificado);
             post.getArquivos().add(arquivo);
         }
+    }
+
+    private void validarTipoArquivo(MultipartFile imagem) {
+        if (imagem != null) {
+            String nomeArquivo = imagem.getOriginalFilename();
+            String extensao = nomeArquivo != null ? nomeArquivo.split("\\.")[1] : null;
+
+            if (isNotImagem(extensao))
+                throw new BusinessException("{post.validacao.arquivoNaoImagem}");
+        }
+    }
+
+    private boolean isNotImagem(String extensao) {
+        if (ObjectUtils.isEmpty(extensao))
+            return true;
+
+        List<String> tiposImagens = new ArrayList<>();
+        tiposImagens.add("jpg");
+        tiposImagens.add("jpeg");
+        tiposImagens.add("bmp");
+        tiposImagens.add("png");
+
+        return !tiposImagens.contains(extensao.toLowerCase().trim());
     }
 
     private Post popularDadosPost(NovoPostDTO novoPostDTO, Usuario criador) {

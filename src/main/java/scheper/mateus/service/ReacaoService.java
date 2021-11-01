@@ -11,6 +11,7 @@ import scheper.mateus.enums.ReacaoEnum;
 import scheper.mateus.repository.ComentarioRepository;
 import scheper.mateus.repository.PostRepository;
 import scheper.mateus.repository.ReacaoRepository;
+import scheper.mateus.repository.UsuarioRepository;
 
 import javax.transaction.Transactional;
 import java.util.ArrayList;
@@ -23,17 +24,16 @@ public class ReacaoService {
 
     private final PostRepository postRepository;
 
-    private final UsuarioService usuarioService;
-
     private final ReacaoRepository reacaoRepository;
 
     private final ComentarioRepository comentarioRepository;
+    private final UsuarioRepository usuarioRepository;
 
-    public ReacaoService(PostRepository postRepository, UsuarioService usuarioService, ReacaoRepository reacaoRepository, ComentarioRepository comentarioRepository) {
+    public ReacaoService(PostRepository postRepository, ReacaoRepository reacaoRepository, ComentarioRepository comentarioRepository, UsuarioRepository usuarioRepository) {
         this.postRepository = postRepository;
-        this.usuarioService = usuarioService;
         this.reacaoRepository = reacaoRepository;
         this.comentarioRepository = comentarioRepository;
+        this.usuarioRepository = usuarioRepository;
     }
 
     @Transactional
@@ -57,7 +57,7 @@ public class ReacaoService {
         }
 
         if (isMarcacaoDiferente(reagirDTO.isMarcado(), reacao, idUsuario)) {
-            Usuario usuario = usuarioService.findUsuarioPorIdUsuario(idUsuario);
+            Usuario usuario = usuarioRepository.getById(idUsuario);
             if (reacaoPossuiUsuario(reacao, idUsuario)) {
                 reacao.getUsuarios().removeIf(u -> u.getIdUsuario().equals(idUsuario));
             } else {

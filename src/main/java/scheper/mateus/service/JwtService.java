@@ -51,7 +51,7 @@ public class JwtService {
                 .getBody();
     }
 
-    public String obterUsuario(String token) {
+    public String obterEmailByToken(String token) {
         return Jwts
                 .parser()
                 .setSigningKey(chaveAssinatura)
