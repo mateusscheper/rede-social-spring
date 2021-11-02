@@ -26,6 +26,8 @@ public class UsuarioCompletoDTO implements Serializable {
 
     private String foto;
 
+    private String statusAmizade;
+
     private List<PostDTO> posts = new ArrayList<>();
 
     public UsuarioCompletoDTO(Usuario usuario) {
@@ -33,7 +35,7 @@ public class UsuarioCompletoDTO implements Serializable {
         this.nome = usuario.getNome();
         this.email = usuario.getEmail();
         this.dataNascimento = usuario.getDataNascimento();
-        this.quantidadeAmigos = usuario.getAmigos().size();
+        this.quantidadeAmigos = usuario.getQuantidadeAmigos();
         this.foto = usuario.getFoto() != null ? usuario.getFoto().getCaminho() : "assets/nopic.png";
     }
 
@@ -83,6 +85,14 @@ public class UsuarioCompletoDTO implements Serializable {
 
     public void setFoto(String foto) {
         this.foto = foto;
+    }
+
+    public String getStatusAmizade() {
+        return statusAmizade;
+    }
+
+    public void setStatusAmizade(String statusAmizade) {
+        this.statusAmizade = statusAmizade;
     }
 
     public List<PostDTO> getPosts() {

@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import scheper.mateus.dto.PostDTO;
 import scheper.mateus.dto.UsuarioCompletoDTO;
 import scheper.mateus.entity.Usuario;
+import scheper.mateus.enums.StatusAmizadeEnum;
 import scheper.mateus.exception.BusinessException;
 import scheper.mateus.repository.UsuarioRepository;
 
@@ -16,6 +17,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import java.util.List;
 
+import static scheper.mateus.utils.ValidatorUtils.ID_DE_USUARIO_NAO_PODE_SER_NULO;
 import static scheper.mateus.utils.ValidatorUtils.validarNulo;
 
 @Service
@@ -45,9 +47,11 @@ public class UsuarioService implements UserDetailsService {
                 .build();
     }
 
-    public UsuarioCompletoDTO findUsuarioPorIdUsuario(Long idUsuario) {
-        validarNulo("ID de usuário não pode ser nulo.", idUsuario);
-        return obterUsuarioCompletoDTO(null, idUsuario);
+    public UsuarioCompletoDTO findUsuarioPorIdUsuario(HttpServletRequest request, Long idUsuario) {
+        validarNulo(ID_DE_USUARIO_NAO_PODE_SER_NULO, idUsuario);
+        String token = obterTokenDoRequest(request);
+        String email = obterEmailPeloToken(token);
+        return obterUsuarioCompletoDTO(email, idUsuario);
     }
 
     public UsuarioCompletoDTO findUsuarioCompletoPorToken(HttpServletRequest request) {
@@ -62,10 +66,42 @@ public class UsuarioService implements UserDetailsService {
     }
 
     private UsuarioCompletoDTO obterUsuarioCompletoDTO(String email, Long idUsuario) {
-        Usuario usuario = idUsuario != null ? usuarioRepository.getById(idUsuario) : usuarioRepository.findByEmail(email);
-        UsuarioCompletoDTO usuarioDTO = new UsuarioCompletoDTO(usuario);
+        Usuario usuarioDoPerfil;
+        Usuario usuarioLogado = null;
+
+        if (idUsuario != null) {
+            usuarioDoPerfil = usuarioRepository.getById(idUsuario);
+            usuarioLogado = usuarioRepository.findByEmail(email);
+        } else {
+            usuarioDoPerfil = usuarioRepository.findByEmail(email);
+        }
+
+        UsuarioCompletoDTO usuarioDTO = new UsuarioCompletoDTO(usuarioDoPerfil);
+        popularStatusAmizade(usuarioDTO, usuarioLogado, usuarioDoPerfil);
         popularPosts(usuarioDTO);
         return usuarioDTO;
+    }
+
+    private void popularStatusAmizade(UsuarioCompletoDTO usuarioDTO, Usuario usuarioLogado, Usuario usuarioDoPerfil) {
+        if (usuarioLogado == null) {
+            usuarioDTO.setStatusAmizade(null);
+            return;
+        }
+
+        boolean isUmLadoAdicionado = usuarioLogado.getAmigos()
+                .stream()
+                .anyMatch(amigo -> amigo.getIdUsuario().equals(usuarioDoPerfil.getIdUsuario()));
+
+        boolean isOutroLadoAdicionado = usuarioDoPerfil.getAmigos()
+                .stream()
+                .anyMatch(amigo -> amigo.getIdUsuario().equals(usuarioLogado.getIdUsuario()));
+
+        if (isUmLadoAdicionado && isOutroLadoAdicionado)
+            usuarioDTO.setStatusAmizade(StatusAmizadeEnum.AMIGOS.getStatus());
+        else if (isUmLadoAdicionado)
+            usuarioDTO.setStatusAmizade(StatusAmizadeEnum.PENDENTE_RESPOSTA.getStatus());
+        else if (isOutroLadoAdicionado)
+            usuarioDTO.setStatusAmizade(StatusAmizadeEnum.PENDENTE_ACEITE.getStatus());
     }
 
     private String obterEmailPeloToken(String token) {
@@ -80,5 +116,46 @@ public class UsuarioService implements UserDetailsService {
         if (!token.startsWith("Bearer "))
             throw new BusinessException("usuario.validacao.naoEncontrado");
         return token.replace("Bearer ", "");
+    }
+
+    public void adicionarAmigo(HttpServletRequest request, Long idUsuario) {
+        validarNulo(ID_DE_USUARIO_NAO_PODE_SER_NULO, idUsuario);
+        String token = obterTokenDoRequest(request);
+        String email = obterEmailPeloToken(token);
+
+        Usuario usuarioLogado = usuarioRepository.findByEmail(email);
+        usuarioLogado.getAmigos().add(usuarioRepository.getById(idUsuario));
+
+        usuarioRepository.save(usuarioLogado);
+    }
+
+    public void desfazerAmizade(HttpServletRequest request, Long idUsuario) {
+        validarNulo(ID_DE_USUARIO_NAO_PODE_SER_NULO, idUsuario);
+        String token = obterTokenDoRequest(request);
+        String email = obterEmailPeloToken(token);
+
+        Usuario usuarioLogado = usuarioRepository.findByEmail(email);
+        Usuario usuarioAmigo = usuarioRepository.getById(idUsuario);
+
+        usuarioAmigo.getAmigos().removeIf(a -> a.getIdUsuario().equals(usuarioLogado.getIdUsuario()));
+        usuarioRepository.save(usuarioLogado);
+
+        usuarioLogado.getAmigos().removeIf(a -> a.getIdUsuario().equals(usuarioAmigo.getIdUsuario()));
+        usuarioRepository.save(usuarioAmigo);
+    }
+
+    public void aceitarAmizade(HttpServletRequest request, Long idUsuario) {
+        adicionarAmigo(request, idUsuario);
+    }
+
+    public void cancelarAdicionar(HttpServletRequest request, Long idUsuario) {
+        validarNulo(ID_DE_USUARIO_NAO_PODE_SER_NULO, idUsuario);
+        String token = obterTokenDoRequest(request);
+        String email = obterEmailPeloToken(token);
+
+        Usuario usuarioLogado = usuarioRepository.findByEmail(email);
+        usuarioLogado.getAmigos().remove(usuarioRepository.getById(idUsuario));
+
+        usuarioRepository.save(usuarioLogado);
     }
 }

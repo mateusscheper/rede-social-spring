@@ -8,6 +8,8 @@ import java.util.ResourceBundle;
 
 public class ValidatorUtils {
 
+    public static final String ID_DE_USUARIO_NAO_PODE_SER_NULO = "ID de usuário não pode ser nulo.";
+
     private ValidatorUtils() {
         throw new UnsupportedOperationException();
     }

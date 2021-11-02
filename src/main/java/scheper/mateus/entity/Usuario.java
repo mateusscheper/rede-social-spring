@@ -145,6 +145,19 @@ public class Usuario {
         this.amigos = amigos;
     }
 
+    public int getQuantidadeAmigos() {
+        int qtde = 0;
+
+        for (Usuario amigo : this.amigos) {
+            if (amigo.getAmigos()
+                    .stream()
+                    .anyMatch(a -> a.getIdUsuario().equals(this.idUsuario)))
+                qtde++;
+        }
+
+        return qtde;
+    }
+
     public List<Post> getPosts() {
         return posts;
     }
