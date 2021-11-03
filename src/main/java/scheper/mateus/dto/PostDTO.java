@@ -1,5 +1,7 @@
 package scheper.mateus.dto;
 
+import scheper.mateus.entity.Post;
+
 import java.io.Serial;
 import java.io.Serializable;
 import java.sql.Timestamp;
@@ -24,6 +26,14 @@ public class PostDTO implements Serializable {
     private LocalDateTime criacao;
 
     public PostDTO() {
+    }
+
+    public PostDTO(Post post) {
+        this.idPost = post.getIdPost();
+        this.descricao = post.getDescricao();
+        this.arquivo = !post.getArquivos().isEmpty() ? post.getArquivos().get(0).getCaminho() : null;
+        this.criador = new UsuarioDTO(post.getUsuario());
+        this.criacao = post.getCriacao();
     }
 
     public PostDTO(Long idPost, String descricao, String arquivo, UsuarioDTO criador, LocalDateTime criacao) {

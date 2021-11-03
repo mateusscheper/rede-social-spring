@@ -8,6 +8,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import scheper.mateus.dto.PostDTO;
 import scheper.mateus.dto.UsuarioCompletoDTO;
+import scheper.mateus.entity.Post;
 import scheper.mateus.entity.Usuario;
 import scheper.mateus.enums.StatusAmizadeEnum;
 import scheper.mateus.exception.BusinessException;
@@ -60,9 +61,9 @@ public class UsuarioService implements UserDetailsService {
         return obterUsuarioCompletoDTO(email, null);
     }
 
-    private void popularPosts(UsuarioCompletoDTO usuarioDTO) {
-        List<PostDTO> posts = postService.findPostsByIdUsuario(usuarioDTO.getIdUsuario());
-        usuarioDTO.setPosts(posts);
+    private void popularPosts(UsuarioCompletoDTO usuarioDTO, Usuario usuarioLogado, Usuario usuarioDoPerfil) {
+        List<Post> posts = usuarioDoPerfil != null ? usuarioDoPerfil.getPosts() : usuarioLogado.getPosts();
+        usuarioDTO.setPosts(posts.stream().map(PostDTO::new).toList());
     }
 
     private UsuarioCompletoDTO obterUsuarioCompletoDTO(String email, Long idUsuario) {
@@ -78,7 +79,7 @@ public class UsuarioService implements UserDetailsService {
 
         UsuarioCompletoDTO usuarioDTO = new UsuarioCompletoDTO(usuarioDoPerfil);
         popularStatusAmizade(usuarioDTO, usuarioLogado, usuarioDoPerfil);
-        popularPosts(usuarioDTO);
+        popularPosts(usuarioDTO, usuarioLogado, usuarioDoPerfil);
         return usuarioDTO;
     }
 
