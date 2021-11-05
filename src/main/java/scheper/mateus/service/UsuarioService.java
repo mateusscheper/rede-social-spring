@@ -6,13 +6,17 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+import scheper.mateus.dto.FotoPerfilDTO;
 import scheper.mateus.dto.PostDTO;
 import scheper.mateus.dto.UsuarioCompletoDTO;
+import scheper.mateus.entity.Arquivo;
 import scheper.mateus.entity.Post;
 import scheper.mateus.entity.Usuario;
 import scheper.mateus.enums.StatusAmizadeEnum;
 import scheper.mateus.exception.BusinessException;
 import scheper.mateus.repository.UsuarioRepository;
+import scheper.mateus.utils.AnexoUtils;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -26,12 +30,10 @@ public class UsuarioService implements UserDetailsService {
 
     private final UsuarioRepository usuarioRepository;
     private final JwtService jwtService;
-    private final PostService postService;
 
-    public UsuarioService(UsuarioRepository usuarioRepository, JwtService jwtService, PostService postService) {
+    public UsuarioService(UsuarioRepository usuarioRepository, JwtService jwtService) {
         this.usuarioRepository = usuarioRepository;
         this.jwtService = jwtService;
-        this.postService = postService;
     }
 
     @Override
@@ -158,5 +160,23 @@ public class UsuarioService implements UserDetailsService {
         usuarioLogado.getAmigos().remove(usuarioRepository.getById(idUsuario));
 
         usuarioRepository.save(usuarioLogado);
+    }
+
+    public FotoPerfilDTO trocarFotoPerfil(Long idUsuario, MultipartFile imagem) {
+        if (imagem == null || imagem.isEmpty())
+            throw new BusinessException("{usuario.validacao.imagemVazia}");
+
+        Usuario usuario = usuarioRepository.getById(idUsuario);
+
+        Arquivo arquivo = AnexoUtils.uparImagemServidorComCropECriarArquivo(imagem, usuario, "usuario");
+
+        if (usuario.getFoto() != null)
+            AnexoUtils.excluirArquivoServidor(usuario.getFoto());
+
+        usuario.setFoto(arquivo);
+
+        usuarioRepository.save(usuario);
+
+        return new FotoPerfilDTO(arquivo.getCaminho(), arquivo.getCaminhoCrop());
     }
 }

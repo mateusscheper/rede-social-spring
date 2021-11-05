@@ -2,10 +2,8 @@ package scheper.mateus.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
-import org.springframework.util.ObjectUtils;
 import org.springframework.web.multipart.MultipartFile;
 import scheper.mateus.dto.ComentarioDTO;
 import scheper.mateus.dto.NovoPostDTO;
@@ -20,12 +18,9 @@ import scheper.mateus.exception.BusinessException;
 import scheper.mateus.repository.ComentarioRepository;
 import scheper.mateus.repository.PostRepository;
 import scheper.mateus.repository.UsuarioRepository;
+import scheper.mateus.utils.AnexoUtils;
 
 import javax.persistence.Transient;
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -73,36 +68,10 @@ public class PostService {
 
     private void uparEAdicionarArquivoAoPost(MultipartFile imagem, Usuario criador, Post post) {
         if (imagem != null && !imagem.isEmpty()) {
-            validarTipoArquivo(imagem);
-            String nomeArquivoCodificado = getNomeArquivoCodificado(imagem, criador);
-            String nomeReal = imagem.getOriginalFilename() != null ? imagem.getOriginalFilename() : imagem.getName();
-            File arquivoUpado = uparArquivoServidor(imagem, nomeArquivoCodificado, criador.getIdUsuario());
-            Arquivo arquivo = criarArquivo(arquivoUpado, criador, nomeReal, nomeArquivoCodificado);
-            post.getArquivos().add(arquivo);
+            Arquivo arquivo = AnexoUtils.uparImagemServidorComCropECriarArquivo(imagem, criador, "post");
+            if (arquivo != null)
+                post.getArquivos().add(arquivo);
         }
-    }
-
-    private void validarTipoArquivo(MultipartFile imagem) {
-        if (imagem != null) {
-            String nomeArquivo = imagem.getOriginalFilename();
-            String extensao = nomeArquivo != null ? nomeArquivo.split("\\.")[1] : null;
-
-            if (isNotImagem(extensao))
-                throw new BusinessException("{post.validacao.arquivoNaoImagem}");
-        }
-    }
-
-    private boolean isNotImagem(String extensao) {
-        if (ObjectUtils.isEmpty(extensao))
-            return true;
-
-        List<String> tiposImagens = new ArrayList<>();
-        tiposImagens.add("jpg");
-        tiposImagens.add("jpeg");
-        tiposImagens.add("bmp");
-        tiposImagens.add("png");
-
-        return !tiposImagens.contains(extensao.toLowerCase().trim());
     }
 
     private Post popularDadosPost(NovoPostDTO novoPostDTO, Usuario criador) {
@@ -112,71 +81,6 @@ public class PostService {
         post.setDescricao(novoPostDTO.getDescricao());
         post.setReacoes(reacaoService.obterReacoesAtivas());
         return post;
-    }
-
-    private String getNomeArquivoCodificado(MultipartFile imagem, Usuario criador) {
-        String nome = codificarNome(criador.getIdUsuario()) + ".";
-        if (imagem.getOriginalFilename() != null)
-            return nome.concat(imagem.getOriginalFilename().substring(imagem.getOriginalFilename().lastIndexOf(".") + 1));
-        else
-            return nome.concat(imagem.getName().substring(imagem.getName().lastIndexOf(".") + 1));
-    }
-
-    private File uparArquivoServidor(MultipartFile arquivo, String nomeArquivoCodificado, Long idUsuario) {
-        try {
-            String pastaUpload = System.getProperty("user.home") + separator() + "uploads" + separator() + "post" + separator();
-
-            if (!new File(pastaUpload).exists())
-                new File(pastaUpload).mkdirs();
-
-            File arquivoReal = criarArquivoFisico(nomeArquivoCodificado, pastaUpload, idUsuario);
-            arquivo.transferTo(arquivoReal);
-
-            return arquivoReal;
-        } catch (IOException e) {
-            throw new BusinessException("Arquivo inválido.");
-        }
-    }
-
-    private File criarArquivoFisico(String nomeArquivoCodificado, String pastaUpload, Long idUsuario) {
-        String caminhoCompletoArquivo = pastaUpload + nomeArquivoCodificado;
-        File arquivoReal = new File(caminhoCompletoArquivo);
-        if (arquivoReal.exists()) {
-            nomeArquivoCodificado = codificarNome(idUsuario);
-            criarArquivoFisico(nomeArquivoCodificado, pastaUpload, idUsuario);
-        }
-        return arquivoReal;
-    }
-
-    private String separator() {
-        String separator = System.getProperty("file.separator");
-        if (StringUtils.isEmpty(separator))
-            return "/";
-        return separator;
-    }
-
-    private Arquivo criarArquivo(File imagem, Usuario usuario, String nomeReal, String nomeCodificado) {
-        try {
-            Arquivo arquivo = new Arquivo();
-            arquivo.setDono(usuario);
-            arquivo.setNomeReal(nomeReal);
-            arquivo.setNomeCodificado(nomeCodificado);
-            arquivo.setCaminho(obterCaminhoUpload(nomeCodificado));
-            arquivo.setTipo(nomeReal.substring(nomeReal.lastIndexOf(".") + 1));
-            arquivo.setTamanho(Files.size(Path.of(imagem.getAbsolutePath())));
-
-            return arquivo;
-        } catch (IOException e) {
-            throw new BusinessException("Arquivo inválido.");
-        }
-    }
-
-    private String obterCaminhoUpload(String nomeCodificado) {
-        return "assets" + separator() + "uploads" + separator() + "post" + separator() + nomeCodificado;
-    }
-
-    private String codificarNome(Long idUsuario) {
-        return idUsuario.toString() + RandomStringUtils.randomAlphanumeric(30);
     }
 
     private NovoPostDTO obterNovoPostDTODoRequest(String post) {

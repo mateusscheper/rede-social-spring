@@ -2,6 +2,8 @@ package scheper.mateus.controller;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+import scheper.mateus.dto.FotoPerfilDTO;
 import scheper.mateus.dto.UsuarioCompletoDTO;
 import scheper.mateus.service.UsuarioService;
 
@@ -51,5 +53,12 @@ public class UsuarioController {
     @ResponseStatus(HttpStatus.OK)
     public void cancelarAdicionar(HttpServletRequest request, @PathVariable("idUsuario") Long idUsuario) {
         usuarioService.cancelarAdicionar(request, idUsuario);
+    }
+
+    @PatchMapping(value = "/{idUsuario}/foto", consumes = { "multipart/form-data", "application/json" })
+    @ResponseStatus(HttpStatus.CREATED)
+    @CrossOrigin(methods = RequestMethod.PATCH)
+    public FotoPerfilDTO trocarFotoPerfil(@PathVariable("idUsuario") Long idUsuario, @RequestPart("imagem") MultipartFile imagem) {
+        return usuarioService.trocarFotoPerfil(idUsuario, imagem);
     }
 }

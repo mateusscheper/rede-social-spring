@@ -31,6 +31,9 @@ public class Arquivo {
     @Column(name = "caminho", nullable = false)
     private String caminho;
 
+    @Column(name = "caminho_crop")
+    private String caminhoCrop;
+
     @Column(name = "tipo", nullable = false)
     private String tipo;
 
@@ -75,6 +78,14 @@ public class Arquivo {
 
     public void setCaminho(String caminho) {
         this.caminho = caminho;
+    }
+
+    public String getCaminhoCrop() {
+        return caminhoCrop;
+    }
+
+    public void setCaminhoCrop(String caminhoCrop) {
+        this.caminhoCrop = caminhoCrop;
     }
 
     public String getTipo() {

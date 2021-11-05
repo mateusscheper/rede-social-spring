@@ -22,7 +22,7 @@ public class UsuarioSimplesDTO implements Serializable {
         this.idUsuario = usuario.getIdUsuario();
         this.nome = usuario.getNome();
         this.email = usuario.getEmail();
-        this.foto = usuario.getFoto() != null ? usuario.getFoto().getCaminho() : "assets/nopic.png";
+        this.foto = usuario.getFoto() != null ? usuario.getFoto().getCaminhoCrop() : "assets/nopic.png";
     }
 
     public Long getIdUsuario() {

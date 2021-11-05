@@ -40,7 +40,7 @@ public class Usuario {
     @Column(name = "senha", nullable = false)
     private String senha;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "id_arquivo_foto")
     private Arquivo foto;
 

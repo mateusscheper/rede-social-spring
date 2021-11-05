@@ -40,7 +40,7 @@ public class UsuarioDTO implements Serializable {
     public UsuarioDTO(Usuario usuario) {
         this.idUsuario = usuario.getIdUsuario();
         this.nome = usuario.getNome();
-        this.foto = usuario.getFoto() != null ? usuario.getFoto().getCaminho() : "assets/nopic.png";
+        this.foto = usuario.getFoto() != null ? usuario.getFoto().getCaminhoCrop() : "assets/nopic.png";
     }
 
     public Long getIdUsuario() {
