@@ -18,11 +18,18 @@ public class UsuarioSimplesDTO implements Serializable {
 
     private String foto;
 
-    public UsuarioSimplesDTO(Usuario usuario) {
+    public UsuarioSimplesDTO(Usuario usuario, boolean isFotoNormal) {
         this.idUsuario = usuario.getIdUsuario();
         this.nome = usuario.getNome();
         this.email = usuario.getEmail();
-        this.foto = usuario.getFoto() != null ? usuario.getFoto().getCaminhoCrop() : "assets/nopic.png";
+
+        if (usuario.getFoto() != null) {
+            if (isFotoNormal)
+                this.foto = usuario.getFoto().getCaminho();
+            else
+                this.foto = usuario.getFoto().getCaminhoCrop();
+        } else
+            this.foto = "assets/nopic.png";
     }
 
     public Long getIdUsuario() {

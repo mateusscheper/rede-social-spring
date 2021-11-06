@@ -10,6 +10,7 @@ import org.springframework.web.multipart.MultipartFile;
 import scheper.mateus.dto.FotoPerfilDTO;
 import scheper.mateus.dto.PostDTO;
 import scheper.mateus.dto.UsuarioCompletoDTO;
+import scheper.mateus.dto.UsuarioSimplesDTO;
 import scheper.mateus.entity.Arquivo;
 import scheper.mateus.entity.Post;
 import scheper.mateus.entity.Usuario;
@@ -72,6 +73,16 @@ public class UsuarioService implements UserDetailsService {
             if (!post.getArquivos().isEmpty())
                 post.getArquivos().forEach(arquivo -> usuarioDTO.getFotos().add(arquivo.getCaminho()));
         }
+
+        return usuarioDTO;
+    }
+
+    public UsuarioCompletoDTO findUsuarioCompletoComAmigosPorIdUsuario(Long idUsuario) {
+        Usuario usuario = usuarioRepository.getById(idUsuario);
+        validarNulo("{usuario.validacao.naoEncontrado}", usuario);
+
+        UsuarioCompletoDTO usuarioDTO = new UsuarioCompletoDTO(usuario);
+        usuario.getAmigos().forEach(amigo -> usuarioDTO.getAmigos().add(new UsuarioSimplesDTO(amigo, true)));
 
         return usuarioDTO;
     }

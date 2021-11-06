@@ -37,6 +37,12 @@ public class UsuarioController {
         return usuarioService.findUsuarioCompletoComFotosPorIdUsuario(idUsuario);
     }
 
+    @GetMapping("/{idUsuario}/amigo")
+    @ResponseStatus(HttpStatus.OK)
+    public UsuarioCompletoDTO findUsuarioCompletoComAmigosPorIdUsuario(@PathVariable("idUsuario") Long idUsuario) {
+        return usuarioService.findUsuarioCompletoComAmigosPorIdUsuario(idUsuario);
+    }
+
     @PostMapping("/{idUsuario}/adicionar")
     @ResponseStatus(HttpStatus.OK)
     public void adicionarAmigo(HttpServletRequest request, @PathVariable("idUsuario") Long idUsuario) {

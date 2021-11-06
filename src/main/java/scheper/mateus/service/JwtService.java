@@ -40,7 +40,7 @@ public class JwtService {
                 .signWith(SignatureAlgorithm.HS512, chaveAssinatura)
                 .compact();
 
-        return new LoginDTO(new UsuarioSimplesDTO(usuario), token);
+        return new LoginDTO(new UsuarioSimplesDTO(usuario, false), token);
     }
 
     public Claims obterClaims(String token) {
