@@ -27,8 +27,14 @@ public class UsuarioController {
 
     @GetMapping("/{idUsuario}")
     @ResponseStatus(HttpStatus.OK)
-    public UsuarioCompletoDTO findUsuarioPorIdUsuario(HttpServletRequest request, @PathVariable("idUsuario") Long idUsuario) {
-        return usuarioService.findUsuarioPorIdUsuario(request, idUsuario);
+    public UsuarioCompletoDTO findUsuarioCompletoPorIdUsuario(HttpServletRequest request, @PathVariable("idUsuario") Long idUsuario) {
+        return usuarioService.findUsuarioCompletoPorIdUsuario(request, idUsuario);
+    }
+
+    @GetMapping("/{idUsuario}/foto")
+    @ResponseStatus(HttpStatus.OK)
+    public UsuarioCompletoDTO findUsuarioCompletoComFotosPorIdUsuario(@PathVariable("idUsuario") Long idUsuario) {
+        return usuarioService.findUsuarioCompletoComFotosPorIdUsuario(idUsuario);
     }
 
     @PostMapping("/{idUsuario}/adicionar")

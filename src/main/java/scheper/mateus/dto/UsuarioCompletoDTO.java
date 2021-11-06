@@ -30,6 +30,8 @@ public class UsuarioCompletoDTO implements Serializable {
 
     private List<PostDTO> posts = new ArrayList<>();
 
+    private List<String> fotos = new ArrayList<>();
+
     public UsuarioCompletoDTO(Usuario usuario) {
         this.idUsuario = usuario.getIdUsuario();
         this.nome = usuario.getNome();
@@ -101,6 +103,14 @@ public class UsuarioCompletoDTO implements Serializable {
 
     public void setPosts(List<PostDTO> posts) {
         this.posts = posts;
+    }
+
+    public List<String> getFotos() {
+        return fotos;
+    }
+
+    public void setFotos(List<String> fotos) {
+        this.fotos = fotos;
     }
 
     @Override

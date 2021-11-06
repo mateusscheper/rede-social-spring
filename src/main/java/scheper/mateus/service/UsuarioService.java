@@ -50,7 +50,7 @@ public class UsuarioService implements UserDetailsService {
                 .build();
     }
 
-    public UsuarioCompletoDTO findUsuarioPorIdUsuario(HttpServletRequest request, Long idUsuario) {
+    public UsuarioCompletoDTO findUsuarioCompletoPorIdUsuario(HttpServletRequest request, Long idUsuario) {
         validarNulo(ID_DE_USUARIO_NAO_PODE_SER_NULO, idUsuario);
         String token = obterTokenDoRequest(request);
         String email = obterEmailPeloToken(token);
@@ -63,9 +63,30 @@ public class UsuarioService implements UserDetailsService {
         return obterUsuarioCompletoDTO(email, null);
     }
 
+    public UsuarioCompletoDTO findUsuarioCompletoComFotosPorIdUsuario(Long idUsuario) {
+        Usuario usuario = usuarioRepository.getById(idUsuario);
+        validarNulo("{usuario.validacao.naoEncontrado}", usuario);
+
+        UsuarioCompletoDTO usuarioDTO = new UsuarioCompletoDTO(usuario);
+        for (Post post : usuario.getPosts()) {
+            if (!post.getArquivos().isEmpty())
+                post.getArquivos().forEach(arquivo -> usuarioDTO.getFotos().add(arquivo.getCaminho()));
+        }
+
+        return usuarioDTO;
+    }
+
     private void popularPosts(UsuarioCompletoDTO usuarioDTO, Usuario usuarioLogado, Usuario usuarioDoPerfil) {
         List<Post> posts = usuarioDoPerfil != null ? usuarioDoPerfil.getPosts() : usuarioLogado.getPosts();
-        usuarioDTO.setPosts(posts.stream().map(PostDTO::new).toList());
+        usuarioDTO.setPosts(posts
+                .stream()
+                .map(PostDTO::new)
+                .sorted((o1, o2) -> {
+                    if (o1.getCriacao() == null || o2.getCriacao() == null)
+                        return 0;
+                    return o2.getCriacao().compareTo(o1.getCriacao());
+                })
+                .toList());
     }
 
     private UsuarioCompletoDTO obterUsuarioCompletoDTO(String email, Long idUsuario) {
