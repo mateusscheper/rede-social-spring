@@ -5,9 +5,13 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import scheper.mateus.dto.FotoPerfilDTO;
 import scheper.mateus.dto.UsuarioCompletoDTO;
+import scheper.mateus.dto.UsuarioSimplesDTO;
 import scheper.mateus.service.UsuarioService;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
+import javax.validation.constraints.NotEmpty;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/usuario")
@@ -72,5 +76,11 @@ public class UsuarioController {
     @CrossOrigin(methods = RequestMethod.PATCH)
     public FotoPerfilDTO trocarFotoPerfil(@PathVariable("idUsuario") Long idUsuario, @RequestPart("imagem") MultipartFile imagem) {
         return usuarioService.trocarFotoPerfil(idUsuario, imagem);
+    }
+
+    @GetMapping("/busca")
+    @ResponseStatus(HttpStatus.OK)
+    public List<UsuarioSimplesDTO> buscarUsuarioPorNomeOuEmail(@RequestParam("q") @Valid @NotEmpty String query) {
+        return usuarioService.buscarUsuarioPorNomeOuEmail(query);
     }
 }

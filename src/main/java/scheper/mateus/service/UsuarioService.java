@@ -82,9 +82,20 @@ public class UsuarioService implements UserDetailsService {
         validarNulo("{usuario.validacao.naoEncontrado}", usuario);
 
         UsuarioCompletoDTO usuarioDTO = new UsuarioCompletoDTO(usuario);
-        usuario.getAmigos().forEach(amigo -> usuarioDTO.getAmigos().add(new UsuarioSimplesDTO(amigo, true)));
+        usuario.getAmigos().forEach(amigo -> {
+            if (isAdicionado(amigo, usuario.getIdUsuario()))
+                usuarioDTO.getAmigos().add(new UsuarioSimplesDTO(amigo, true));
+        });
 
         return usuarioDTO;
+    }
+
+    private boolean isAdicionado(Usuario amigo, Long idUsuario) {
+        for (Usuario amigoAmigo : amigo.getAmigos()) {
+            if (amigoAmigo.getIdUsuario().equals(idUsuario))
+                return true;
+        }
+        return false;
     }
 
     private void popularPosts(UsuarioCompletoDTO usuarioDTO, Usuario usuarioLogado, Usuario usuarioDoPerfil) {
@@ -210,5 +221,16 @@ public class UsuarioService implements UserDetailsService {
         usuarioRepository.save(usuario);
 
         return new FotoPerfilDTO(arquivo.getCaminho(), arquivo.getCaminhoCrop());
+    }
+
+    public List<UsuarioSimplesDTO> buscarUsuarioPorNomeOuEmail(String query) {
+        validarNulo("{buscaUsuario.validacao.vazio}", query);
+
+        List<Usuario> resultado = usuarioRepository.buscarUsuarioPorNomeOuEmail(query);
+
+        return resultado
+                .stream()
+                .map(u -> new UsuarioSimplesDTO(u, false))
+                .toList();
     }
 }

@@ -7,6 +7,8 @@ import org.springframework.stereotype.Repository;
 import scheper.mateus.dto.UsuarioDTO;
 import scheper.mateus.entity.Usuario;
 
+import java.util.List;
+
 @Repository
 public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
 
@@ -24,4 +26,10 @@ public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
 
      @Query(value = "SELECT u.idUsuario FROM Usuario u WHERE u.email = :email")
      Long findIdByEmail(@Param("email") String email);
+
+     @Query(value = "SELECT u " +
+             "FROM Usuario u " +
+             "WHERE LOWER(u.nome) LIKE CONCAT('%', LOWER(:query), '%') " +
+             "   OR LOWER(u.email) LIKE CONCAT('%', LOWER(:query), '%')")
+    List<Usuario> buscarUsuarioPorNomeOuEmail(String query);
 }
