@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import scheper.mateus.dto.PostCompletoDTO;
-import scheper.mateus.dto.PostDTO;
 import scheper.mateus.service.PostService;
 
 import javax.validation.constraints.NotNull;
@@ -35,8 +34,8 @@ public class PostController {
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    public List<PostDTO> findPostsByIdUsuario(@RequestParam("idUsuario") @NotNull Long idUsuario) {
-        return postService.findPostsByIdUsuario(idUsuario);
+    public List<PostCompletoDTO> findPostsByIdUsuario(@RequestParam("idUsuario") @NotNull Long idUsuario) {
+        return postService.findPostsByIdUsuario(idUsuario, true);
     }
 
     @GetMapping("/{idPost}")

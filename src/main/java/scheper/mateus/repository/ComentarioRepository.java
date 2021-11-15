@@ -24,6 +24,20 @@ public interface ComentarioRepository extends JpaRepository<Comentario, Long> {
             "LIMIT :limit", nativeQuery = true)
     List<Object[]> findComentariosPorIdPost(@Param("idPost") Long idPost, @Param("limit") Integer limit);
 
+    @Query(value = "SELECT c.id_comentario, " +
+            "       u.id_usuario, " +
+            "       u.nome, " +
+            "       COALESCE(a.caminho, 'assets/nopic.png'), " +
+            "       c.descricao, " +
+            "       c.id_post " +
+            "FROM api.comentario c " +
+            "         JOIN api.usuario u ON c.id_usuario_criador = u.id_usuario " +
+            "         LEFT JOIN api.arquivo a ON u.id_arquivo_foto = a.id_arquivo " +
+            "WHERE c.id_post IN (:idsPost) " +
+            "ORDER BY c.criacao DESC " +
+            "LIMIT 10", nativeQuery = true)
+    List<Object[]> findComentariosPorIdsPost(@Param("idsPost") List<Long> idsPost);
+
     @Query(value = "SELECT count(c) " +
             "FROM api.comentario c " +
             "WHERE c.id_post = :idPost", nativeQuery = true)

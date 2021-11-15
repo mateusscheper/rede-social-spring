@@ -32,11 +32,14 @@ public class ComentarioService {
 
     private final ReacaoService reacaoService;
 
-    public ComentarioService(ComentarioRepository comentarioRepository, UsuarioRepository usuarioRepository, PostRepository postRepository, ReacaoService reacaoService) {
+    private final NotificacaoService notificacaoService;
+
+    public ComentarioService(ComentarioRepository comentarioRepository, UsuarioRepository usuarioRepository, PostRepository postRepository, ReacaoService reacaoService, NotificacaoService notificacaoService) {
         this.comentarioRepository = comentarioRepository;
         this.usuarioRepository = usuarioRepository;
         this.postRepository = postRepository;
         this.reacaoService = reacaoService;
+        this.notificacaoService = notificacaoService;
     }
 
     public void save(NovoComentarioDTO novoComentarioDTO) {
@@ -45,15 +48,52 @@ public class ComentarioService {
         Comentario comentario = new Comentario();
         comentario.setCriador(obterUsuario(novoComentarioDTO.getIdUsuario()));
 
-        if (novoComentarioDTO.getIdPost() != null)
-            comentario.setPost(obterPost(novoComentarioDTO.getIdPost()));
-        else if (novoComentarioDTO.getIdComentario() != null)
-            comentario.setComentarioPai(comentarioRepository.getById(novoComentarioDTO.getIdComentario()));
+        Post post = null;
+        Comentario comentarioPai = null;
+        if (novoComentarioDTO.getIdPost() != null) {
+            post = obterPost(novoComentarioDTO.getIdPost());
+            comentario.setPost(post);
+        } else if (novoComentarioDTO.getIdComentario() != null) {
+            comentarioPai = comentarioRepository.getById(novoComentarioDTO.getIdComentario());
+            comentario.setComentarioPai(comentarioPai);
+        }
 
         comentario.setDescricao(novoComentarioDTO.getDescricao());
         comentario.setCriacao(LocalDateTime.now());
         comentario.setReacoes(reacaoService.obterReacoesAtivas());
         comentarioRepository.save(comentario);
+        notificarDonoPostOuComentarioPai(post, comentarioPai, novoComentarioDTO.getIdUsuario());
+    }
+
+    private void notificarDonoPostOuComentarioPai(Post post, Comentario comentarioPai, Long idUsuario) {
+        Usuario usuarioCriador = obterUsuarioCriador(post, comentarioPai);
+        Usuario usuarioLogado = obterUsuario(idUsuario);
+        criarNotificacao(post, comentarioPai, usuarioCriador, usuarioLogado);
+    }
+
+    private void criarNotificacao(Post post, Comentario comentarioPai, Usuario usuarioCriador, Usuario usuarioLogado) {
+        notificacaoService.criarNotificacao(usuarioLogado, usuarioCriador, obterMensagemConteudo(post != null, usuarioLogado), obterLinkComentario(post, comentarioPai));
+    }
+
+    private Usuario obterUsuarioCriador(Post post, Comentario comentarioPai) {
+        if (post != null)
+            return post.getUsuario();
+        else if (comentarioPai != null)
+            return comentarioPai.getCriador();
+        return null;
+    }
+
+    private String obterLinkComentario(Post post, Comentario comentarioPai) {
+        if (post != null)
+            return "/post/" + post.getIdPost();
+        else if (comentarioPai != null && comentarioPai.getPost() != null)
+            return "/post/" + comentarioPai.getPost().getIdPost();
+        else
+            return null;
+    }
+
+    private String obterMensagemConteudo(boolean isPost, Usuario usuarioLogado) {
+        return usuarioLogado.getNome() + (isPost ? " comentou em seu post." : " respondeu seu comentário.");
     }
 
     public List<ComentarioDTO> findComentariosPorIdPost(Long idPost, Long idUsuario, Integer limit) {

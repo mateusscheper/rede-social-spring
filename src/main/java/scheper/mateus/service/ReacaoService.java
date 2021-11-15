@@ -27,13 +27,17 @@ public class ReacaoService {
     private final ReacaoRepository reacaoRepository;
 
     private final ComentarioRepository comentarioRepository;
+
     private final UsuarioRepository usuarioRepository;
 
-    public ReacaoService(PostRepository postRepository, ReacaoRepository reacaoRepository, ComentarioRepository comentarioRepository, UsuarioRepository usuarioRepository) {
+    private final NotificacaoService notificacaoService;
+
+    public ReacaoService(PostRepository postRepository, ReacaoRepository reacaoRepository, ComentarioRepository comentarioRepository, UsuarioRepository usuarioRepository, NotificacaoService notificacaoService) {
         this.postRepository = postRepository;
         this.reacaoRepository = reacaoRepository;
         this.comentarioRepository = comentarioRepository;
         this.usuarioRepository = usuarioRepository;
+        this.notificacaoService = notificacaoService;
     }
 
     @Transactional
@@ -48,7 +52,7 @@ public class ReacaoService {
         Post post = null;
         Comentario comentario = null;
         Reacao reacao;
-        if (idComentario == null) {
+        if (isReacaoEmPost(idComentario)) {
             post = postRepository.getById(idPost);
             reacao = filtrarReacao(reagirDTO, post, null);
         } else {
@@ -58,21 +62,138 @@ public class ReacaoService {
 
         if (isMarcacaoDiferente(reagirDTO.isMarcado(), reacao, idUsuario)) {
             Usuario usuario = usuarioRepository.getById(idUsuario);
+
             if (reacaoPossuiUsuario(reacao, idUsuario)) {
-                reacao.getUsuarios().removeIf(u -> u.getIdUsuario().equals(idUsuario));
+                desmarcarReacao(idUsuario, reacao);
+                excluirNotificacoes(idUsuario, post, comentario);
             } else {
-                if (!reacao.getUsuarios().contains(usuario))
-                    reacao.getUsuarios().add(usuario);
+                if (naoPossuiReacao(reacao, usuario)) {
+                    marcarReacao(reacao, usuario);
+                    notificarReacao(post, comentario, usuario, reacao.getIdReacao());
+                }
                 desmarcarOutrasReacoes(post, comentario, reagirDTO.getIdReacao(), idUsuario);
             }
 
             reacaoRepository.save(reacao);
 
-            if (comentario == null)
-                postRepository.save(post);
-            else
-                comentarioRepository.save(comentario);
+            salvarPostOuComentarioReagido(post, comentario);
         }
+    }
+
+    private void excluirNotificacoes(Long idUsuario, Post post, Comentario comentario) {
+        Usuario usuarioDoPostOuComentario = post != null ? post.getUsuario() : comentario.getCriador();
+        if (usuarioDoPostOuComentario != null)
+            notificacaoService.removerNotificacaoAdicionar(idUsuario, usuarioDoPostOuComentario.getIdUsuario());
+    }
+
+    private void notificarReacao(Post post, Comentario comentario, Usuario usuarioLogado, Long idReacao) {
+        if (isPostOuComentarioDeUsuarioDiferente(post, comentario, usuarioLogado.getIdUsuario())
+                && !postOuComentarioPossuiReacaoUsuario(post, comentario, usuarioLogado.getIdUsuario(), idReacao)) {
+            notificacaoService.criarNotificacao(usuarioLogado,
+                    obterUsuarioNotificarReacao(post, comentario),
+                    obterMensagemReacao(post, comentario, usuarioLogado),
+                    obterLinkPost(post, comentario));
+        }
+    }
+
+    private boolean postOuComentarioPossuiReacaoUsuario(Post post, Comentario comentario, Long idUsuario, Long idReacao) {
+        List<Reacao> reacoes = post != null ? post.getReacoes() : comentario.getReacoes();
+
+        return reacoes
+                .stream()
+                .anyMatch(r -> !r.getIdReacao().equals(idReacao)
+                        && r.getUsuarios()
+                        .stream()
+                        .anyMatch(u -> u.getIdUsuario().equals(idUsuario)));
+    }
+
+    public List<ReacaoDTO> findReacoesPorIdPostOuIdComentario(Long idPost, Long idComentario, Long idUsuario) {
+        List<ReacaoDTO> reacoesDTO = new ArrayList<>();
+        validarNulo("ID de post inválido.", idPost, idComentario);
+
+        Post post;
+        Comentario comentario;
+        List<Reacao> reacoes;
+
+        if (idComentario == null) {
+            post = postRepository.getById(idPost);
+            reacoes = post.getReacoes();
+        } else {
+            comentario = comentarioRepository.getById(idComentario);
+            reacoes = comentario.getReacoes();
+        }
+
+        for (Reacao reacao : reacoes) {
+            ReacaoDTO reacaoDTO = new ReacaoDTO(reacao, idUsuario);
+            reacoesDTO.add(reacaoDTO);
+        }
+
+        return reacoesDTO;
+    }
+
+    public List<Reacao> obterReacoesAtivas() {
+        List<Reacao> reacoes = new ArrayList<>();
+        for (ReacaoEnum reacaoEnum : ReacaoEnum.values())
+            reacoes.add(new Reacao(reacaoEnum));
+        return reacoes;
+    }
+
+    private boolean isPostOuComentarioDeUsuarioDiferente(Post post, Comentario comentario, Long idUsuario) {
+        Usuario usuarioDoPostOuComentario = post != null ? post.getUsuario() : comentario.getCriador();
+        return usuarioDoPostOuComentario != null && !usuarioDoPostOuComentario.getIdUsuario().equals(idUsuario);
+    }
+
+    private String obterMensagemReacao(Post post, Comentario comentario, Usuario usuarioLogado) {
+        String conteudo = usuarioLogado.getNome() + " reagiu ao seu ";
+        if (post != null)
+            return conteudo + "post.";
+        else if (comentario != null)
+            return conteudo + "comentário.";
+        return null;
+    }
+
+    private String obterLinkPost(Post post, Comentario comentario) {
+        String url = "/post/";
+
+        if (post != null)
+            return url + post.getIdPost();
+        else if (comentario != null && comentario.getPost() != null)
+            return url + comentario.getPost().getIdPost();
+        else if (comentario != null && comentario.getComentarioPai() != null && comentario.getComentarioPai().getPost() != null)
+            return url + comentario.getComentarioPai().getPost().getIdPost();
+
+        return null;
+    }
+
+    private Usuario obterUsuarioNotificarReacao(Post post, Comentario comentario) {
+        if (post != null)
+            return post.getUsuario();
+        else if (comentario != null)
+            return comentario.getCriador();
+        return null;
+    }
+
+    private void salvarPostOuComentarioReagido(Post post, Comentario comentario) {
+        if (comentario == null)
+            postRepository.save(post);
+        else
+            comentarioRepository.save(comentario);
+    }
+
+    private void marcarReacao(Reacao reacao, Usuario usuario) {
+        reacao.getUsuarios().add(usuario);
+    }
+
+    private boolean naoPossuiReacao(Reacao reacao, Usuario usuario) {
+        return !reacao.getUsuarios().contains(usuario);
+    }
+
+    private boolean desmarcarReacao(Long idUsuario, Reacao reacao) {
+        return reacao.getUsuarios().removeIf(u -> u.getIdUsuario().equals(idUsuario));
+    }
+
+    private boolean isReacaoEmPost(Long idComentario) {
+        return idComentario == null;
     }
 
     private boolean isMarcacaoDiferente(boolean isUsuarioMarcando, Reacao reacao, Long idUsuario) {
@@ -88,7 +209,7 @@ public class ReacaoService {
     private void desmarcarOutrasReacoes(Post post, Comentario comentario, Long idTipo, Long idUsuario) {
         List<Reacao> reacoesNaoMarcadas = filtrarReacoesParaDesmarcar(post, comentario, idTipo);
         for (Reacao reacao : reacoesNaoMarcadas) {
-            reacao.getUsuarios().removeIf(u -> u.getIdUsuario().equals(idUsuario));
+            desmarcarReacao(idUsuario, reacao);
             reacaoRepository.save(reacao);
         }
     }
@@ -127,36 +248,5 @@ public class ReacaoService {
         return reacao.getUsuarios()
                 .stream()
                 .anyMatch(u -> u.getIdUsuario().equals(idUsuario));
-    }
-
-    public List<ReacaoDTO> findReacoesPorIdPostOuIdComentario(Long idPost, Long idComentario, Long idUsuario) {
-        List<ReacaoDTO> reacoesDTO = new ArrayList<>();
-        validarNulo("ID de post inválido.", idPost, idComentario);
-
-        Post post;
-        Comentario comentario;
-        List<Reacao> reacoes;
-
-        if (idComentario == null) {
-            post = postRepository.getById(idPost);
-            reacoes = post.getReacoes();
-        } else {
-            comentario = comentarioRepository.getById(idComentario);
-            reacoes = comentario.getReacoes();
-        }
-
-        for (Reacao reacao : reacoes) {
-            ReacaoDTO reacaoDTO = new ReacaoDTO(reacao, idUsuario);
-            reacoesDTO.add(reacaoDTO);
-        }
-
-        return reacoesDTO;
-    }
-
-    public List<Reacao> obterReacoesAtivas() {
-        List<Reacao> reacoes = new ArrayList<>();
-        for (ReacaoEnum reacaoEnum : ReacaoEnum.values())
-            reacoes.add(new Reacao(reacaoEnum));
-        return reacoes;
     }
 }

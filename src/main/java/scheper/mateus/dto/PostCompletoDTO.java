@@ -1,11 +1,16 @@
 package scheper.mateus.dto;
 
+import scheper.mateus.entity.Post;
+
 import java.io.Serial;
 import java.io.Serializable;
+import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+
+import static scheper.mateus.utils.NumberUtils.castBigIntegerToLong;
 
 public class PostCompletoDTO implements Serializable {
 
@@ -25,6 +30,25 @@ public class PostCompletoDTO implements Serializable {
     private List<ReacaoDTO> reacoes = new ArrayList<>();
 
     private List<ComentarioDTO> comentarios = new ArrayList<>();
+
+    public PostCompletoDTO() {
+    }
+
+    public PostCompletoDTO(Object[] dadosPost) {
+        this.idPost = castBigIntegerToLong(dadosPost[0]);
+        this.descricao = (String) dadosPost[1];
+        this.arquivo = (String) dadosPost[2];
+        this.criador = new UsuarioDTO(dadosPost);
+        this.criacao = ((Timestamp) dadosPost[6]).toLocalDateTime();
+    }
+
+    public PostCompletoDTO(Post post) {
+        this.idPost = post.getIdPost();
+        this.descricao = post.getDescricao();
+        this.arquivo = !post.getArquivos().isEmpty() ? post.getArquivos().get(0).getCaminho() : null;
+        this.criador = new UsuarioDTO(post.getUsuario());
+        this.criacao = post.getCriacao();
+    }
 
     public Long getIdPost() {
         return idPost;

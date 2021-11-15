@@ -28,7 +28,7 @@ public class UsuarioCompletoDTO implements Serializable {
 
     private String statusAmizade;
 
-    private List<PostDTO> posts = new ArrayList<>();
+    private List<PostCompletoDTO> posts = new ArrayList<>();
 
     private List<String> fotos = new ArrayList<>();
 
@@ -99,11 +99,11 @@ public class UsuarioCompletoDTO implements Serializable {
         this.statusAmizade = statusAmizade;
     }
 
-    public List<PostDTO> getPosts() {
+    public List<PostCompletoDTO> getPosts() {
         return posts;
     }
 
-    public void setPosts(List<PostDTO> posts) {
+    public void setPosts(List<PostCompletoDTO> posts) {
         this.posts = posts;
     }
 

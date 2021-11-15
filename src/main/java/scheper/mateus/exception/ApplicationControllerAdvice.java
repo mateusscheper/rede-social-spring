@@ -20,6 +20,8 @@ public class ApplicationControllerAdvice {
     @ExceptionHandler(BusinessException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ApiErrors handleException(BusinessException e) {
+        e.printStackTrace();
+
         String message = e.getMessage();
 
         if (message.startsWith("{") && message.endsWith("}")) {
@@ -37,12 +39,16 @@ public class ApplicationControllerAdvice {
     @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
     @ResponseStatus(HttpStatus.METHOD_NOT_ALLOWED)
     public ApiErrors handleException(HttpRequestMethodNotSupportedException e) {
+        e.printStackTrace();
+
         return new ApiErrors(String.format("Método %s não permitido.", e.getMethod()));
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ApiErrors handleException(MethodArgumentNotValidException e) {
+        e.printStackTrace();
+
         List<String> errosEmString = e.getAllErrors()
                 .stream()
                 .map(DefaultMessageSourceResolvable::getDefaultMessage)
@@ -56,7 +62,16 @@ public class ApplicationControllerAdvice {
     })
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ApiErrors handleException(Exception e) {
+        e.printStackTrace();
+
         return new ApiErrors("Dados inválidos.");
     }
 
+    @ExceptionHandler(RuntimeException.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public ApiErrors handleException(RuntimeException e) {
+        e.printStackTrace();
+
+        return new ApiErrors("Ocorreu um erro interno no servidor.");
+    }
 }
