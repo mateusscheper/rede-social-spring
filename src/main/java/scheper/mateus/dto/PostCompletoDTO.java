@@ -27,6 +27,8 @@ public class PostCompletoDTO implements Serializable {
 
     private LocalDateTime criacao;
 
+    private boolean possuiReport;
+
     private List<ReacaoDTO> reacoes = new ArrayList<>();
 
     private List<ComentarioDTO> comentarios = new ArrayList<>();
@@ -40,6 +42,7 @@ public class PostCompletoDTO implements Serializable {
         this.arquivo = (String) dadosPost[2];
         this.criador = new UsuarioDTO(dadosPost);
         this.criacao = ((Timestamp) dadosPost[6]).toLocalDateTime();
+        this.possuiReport = (boolean) dadosPost[7];
     }
 
     public PostCompletoDTO(Post post) {
@@ -88,6 +91,14 @@ public class PostCompletoDTO implements Serializable {
 
     public void setCriacao(LocalDateTime criacao) {
         this.criacao = criacao;
+    }
+
+    public boolean isPossuiReport() {
+        return possuiReport;
+    }
+
+    public void setPossuiReport(boolean possuiReport) {
+        this.possuiReport = possuiReport;
     }
 
     public List<ReacaoDTO> getReacoes() {

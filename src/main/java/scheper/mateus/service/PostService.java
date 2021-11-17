@@ -15,6 +15,7 @@ import scheper.mateus.entity.Usuario;
 import scheper.mateus.exception.BusinessException;
 import scheper.mateus.repository.ComentarioRepository;
 import scheper.mateus.repository.PostRepository;
+import scheper.mateus.repository.ReportRepository;
 import scheper.mateus.repository.UsuarioRepository;
 import scheper.mateus.utils.AnexoUtils;
 
@@ -42,13 +43,16 @@ public class PostService {
 
     private final NotificacaoService notificacaoService;
 
-    public PostService(PostRepository postRepository, UsuarioRepository usuarioRepository, ComentarioRepository comentarioRepository, ReacaoService reacaoService, ComentarioService comentarioService, NotificacaoService notificacaoService) {
+    private final ReportRepository reportRepository;
+
+    public PostService(PostRepository postRepository, UsuarioRepository usuarioRepository, ComentarioRepository comentarioRepository, ReacaoService reacaoService, ComentarioService comentarioService, NotificacaoService notificacaoService, ReportRepository reportRepository) {
         this.postRepository = postRepository;
         this.usuarioRepository = usuarioRepository;
         this.comentarioRepository = comentarioRepository;
         this.reacaoService = reacaoService;
         this.comentarioService = comentarioService;
         this.notificacaoService = notificacaoService;
+        this.reportRepository = reportRepository;
     }
 
     @Transient
@@ -81,6 +85,7 @@ public class PostService {
 
         Post post = postRepository.getById(idPost);
         PostCompletoDTO postCompletoDTO = new PostCompletoDTO(post);
+        postCompletoDTO.setPossuiReport(reportRepository.existeReportAberto(post.getIdPost()));
         popularComentariosEReacoesCompletos(idUsuario, Collections.singletonList(postCompletoDTO));
 
         return postCompletoDTO;

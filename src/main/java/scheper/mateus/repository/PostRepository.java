@@ -17,7 +17,10 @@ public interface PostRepository extends JpaRepository<Post, Long> {
             "                      usuario.id_usuario, " +
             "                      usuario.nome, " +
             "                      COALESCE(api.arquivo.caminho, 'assets/nopic.png'), " +
-            "                      api.post.criacao " +
+            "                      api.post.criacao, " +
+            "                      EXISTS(SELECT 1 FROM api.report " +
+            "                               WHERE report.post_id_post = post.id_post " +
+            "                               AND report.status IN ('Aberto', 'Em avaliação')) " +
             "               FROM api.post " +
             "                        LEFT JOIN api.post_arquivos ON post.id_post = post_arquivos.id_post " +
             "                        LEFT JOIN api.arquivo pa ON post_arquivos.id_arquivo = pa.id_arquivo " +
@@ -33,7 +36,10 @@ public interface PostRepository extends JpaRepository<Post, Long> {
             "                      usuario.id_usuario, " +
             "                      usuario.nome, " +
             "                      COALESCE(api.arquivo.caminho, 'assets/nopic.png'), " +
-            "                      api.post.criacao " +
+            "                      api.post.criacao, " +
+            "                      EXISTS(SELECT 1 FROM api.report " +
+            "                               WHERE report.post_id_post = post.id_post " +
+            "                               AND report.status IN ('Aberto', 'Em avaliação')) " +
             "               FROM api.post " +
             "                        LEFT JOIN api.post_arquivos ON post.id_post = post_arquivos.id_post " +
             "                        LEFT JOIN api.arquivo pa ON post_arquivos.id_arquivo = pa.id_arquivo " +
@@ -53,7 +59,10 @@ public interface PostRepository extends JpaRepository<Post, Long> {
             "                      usuario.id_usuario, " +
             "                      usuario.nome, " +
             "                      COALESCE(api.arquivo.caminho, 'assets/nopic.png'), " +
-            "                      api.post.criacao " +
+            "                      api.post.criacao, " +
+            "                      EXISTS(SELECT 1 FROM api.report " +
+            "                               WHERE report.post_id_post = post.id_post " +
+            "                               AND report.status IN ('Aberto', 'Em avaliação')) " +
             "               FROM api.post " +
             "                        LEFT JOIN api.post_arquivos ON post.id_post = post_arquivos.id_post " +
             "                        LEFT JOIN api.arquivo pa ON post_arquivos.id_arquivo = pa.id_arquivo " +
