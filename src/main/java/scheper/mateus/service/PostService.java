@@ -69,15 +69,8 @@ public class PostService {
     public List<PostCompletoDTO> findPostsByIdUsuario(Long idUsuario, boolean mostrarPostsAmigos) {
         validarNulo("ID de usuário inválido.", idUsuario);
         List<PostCompletoDTO> posts = obterPostsDTO(idUsuario, mostrarPostsAmigos);
-        popularComentariosEReacoesCompletos(idUsuario, posts);
+        popularComentariosEReacoes(idUsuario, posts);
         return posts;
-    }
-
-    private void popularComentariosEReacoesCompletos(Long idUsuario, List<PostCompletoDTO> posts) {
-        popularReacoes(posts, idUsuario);
-        popularComentarios(posts);
-        popularReacoesComentarios(posts, idUsuario);
-        popularSubcomentarios(posts, idUsuario);
     }
 
     public PostCompletoDTO findPostCompletoPorIdPost(Long idPost, Long idUsuario) {
@@ -86,9 +79,16 @@ public class PostService {
         Post post = postRepository.getById(idPost);
         PostCompletoDTO postCompletoDTO = new PostCompletoDTO(post);
         postCompletoDTO.setPossuiReport(reportRepository.existeReportAberto(post.getIdPost()));
-        popularComentariosEReacoesCompletos(idUsuario, Collections.singletonList(postCompletoDTO));
+        popularComentariosEReacoes(idUsuario, Collections.singletonList(postCompletoDTO));
 
         return postCompletoDTO;
+    }
+
+    private void popularComentariosEReacoes(Long idUsuario, List<PostCompletoDTO> posts) {
+        popularReacoes(posts, idUsuario);
+        popularComentarios(posts);
+        popularReacoesComentarios(posts, idUsuario);
+        popularSubcomentarios(posts, idUsuario);
     }
 
     private List<PostCompletoDTO> obterPostsDTO(Long idUsuario, boolean mostrarPostsAmigos) {
