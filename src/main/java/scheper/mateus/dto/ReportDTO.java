@@ -1,5 +1,7 @@
 package scheper.mateus.dto;
 
+import scheper.mateus.entity.Report;
+
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.io.Serial;
@@ -19,6 +21,21 @@ public class ReportDTO implements Serializable {
 
     @NotNull(message = "{report.validacao.id}")
     private Long id;
+
+    public ReportDTO() {
+    }
+
+    public ReportDTO(String conteudo, String tipo, Long id) {
+        this.conteudo = conteudo;
+        this.tipo = tipo;
+        this.id = id;
+    }
+
+    public ReportDTO(Report report) {
+        this.conteudo = report.getConteudo();
+        this.tipo = report.getPost() != null ? "post" : "comentario";
+        this.id = report.getIdReport();
+    }
 
     public String getConteudo() {
         return conteudo;

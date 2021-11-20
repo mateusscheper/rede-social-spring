@@ -1,5 +1,6 @@
 package scheper.mateus.service;
 
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import scheper.mateus.dto.ReportDTO;
 import scheper.mateus.entity.Comentario;
@@ -12,6 +13,7 @@ import scheper.mateus.repository.PostRepository;
 import scheper.mateus.repository.ReportRepository;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 
 @Service
 public class AdminService {
@@ -59,5 +61,12 @@ public class AdminService {
             return false;
 
         return reportRepository.existeReportAberto(idPostOuComentario);
+    }
+
+    public List<ReportDTO> consultarReports() {
+        return reportRepository.findAll(Sort.by("idReport"))
+                .stream()
+                .map(ReportDTO::new)
+                .toList();
     }
 }

@@ -7,6 +7,7 @@ import scheper.mateus.service.AdminService;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/admin")
@@ -22,5 +23,11 @@ public class AdminController {
     @ResponseStatus(HttpStatus.CREATED)
     public void reportar(@RequestBody @Valid ReportDTO reportDTO, HttpServletRequest request) {
         adminService.reportar(reportDTO, request);
+    }
+
+    @GetMapping("/report")
+    @ResponseStatus(HttpStatus.CREATED)
+    public List<ReportDTO> consultarReports() {
+        return adminService.consultarReports();
     }
 }
